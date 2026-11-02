@@ -222,6 +222,7 @@ h2, h3 { text-wrap: balance; }
 .res.push, .res.surr { background: #d8ddd9; color: #18201c; }
 
 .betspot { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.betspot .rings { display: flex; gap: 12px; }
 .betring { width: calc(var(--cw) * 1.3); height: calc(var(--cw) * 1.3); border-radius: 50%; border: 2px dashed var(--print); display: grid; place-items: center; position: relative; }
 .betring .chipstack { position: relative; width: 44px; height: 44px; }
 .betring .chipstack i { position: absolute; left: 0; width: 44px; height: 44px; border-radius: 50%; background: radial-gradient(circle, var(--c) 0 52%, transparent 53%), repeating-conic-gradient(var(--c) 0 20deg, #f3efe4 20deg 30deg); box-shadow: inset 0 0 0 3px var(--c), 0 3px 6px rgba(0,0,0,.4); }
@@ -238,18 +239,21 @@ h2, h3 { text-wrap: balance; }
 
 /* feedback */
 .fb { max-width: min(600px, 100%); box-sizing: border-box; display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 10px; row-gap: 1px; align-items: center; padding: 8px 14px 8px 9px; border-radius: 14px; background: rgba(5, 20, 14, .82); box-shadow: 0 8px 20px rgba(0,0,0,.28); }
-.fb .ico { grid-row: span 2; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font: 800 14px/1 var(--f-body); }
+.fb .ico { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font: 800 14px/1 var(--f-body); }
 .fb.ok .ico { background: var(--good); color: var(--good-ink); }
 .fb.bad .ico { background: var(--bad); color: var(--bad-ink); }
-.fb .l1 { font-weight: 700; font-size: 14px; }
-.fb .l1 em { font-style: normal; font: 700 10px/1 var(--f-display); letter-spacing: .12em; text-transform: uppercase; padding: 3px 6px; border-radius: 5px; background: var(--gold); color: var(--gold-ink); margin-left: 6px; vertical-align: 2px; }
-.fb .l2 { font-size: 12.5px; color: var(--text-2); }
 .fb.bad { box-shadow: 0 0 0 1.5px rgba(255,107,95,.7), 0 8px 20px rgba(0,0,0,.28); }
-.fb .l3 { grid-column: 2; font-size: 12.5px; color: var(--text-2); }
-.fb .l3 b { color: var(--text); font-weight: 700; }
+/* three rows: your play and its EV, the play to compare it with, then the deviations for the hand */
+.fbr { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 18px; align-items: baseline; }
+.fbr .p { font-size: 13px; color: var(--text-2); }
+.fbr .v { justify-self: end; font: 600 13px/1.4 var(--f-mono); font-variant-numeric: tabular-nums; color: var(--text-2); }
+.fbr .you { color: var(--text); font-weight: 700; font-size: 14.5px; }
+.fbr .dv { grid-column: 1 / -1; margin-top: 2px; font-size: 12.5px; color: var(--text-2); }
 .addv { display: inline-block; margin-top: 4px; padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(244,192,79,.6); background: transparent; color: var(--warn); font: 700 12px/1.2 var(--f-body); text-align: left; cursor: pointer; }
 .addv:hover { background: rgba(244,192,79,.12); }
 .addv.done { border-color: transparent; color: var(--good); cursor: default; padding: 6px 0; }
+.addv.sm { margin: 0 0 0 8px; padding: 2px 8px; font-size: 11.5px; vertical-align: 1px; }
+.addv.done.sm { padding: 2px 0; }
 .cdevs { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; max-width: 100%; }
 .cdev { display: inline-flex; align-items: center; gap: 4px; padding: 3px 3px 3px 10px; border-radius: 999px; background: var(--panel-2); border: 1px solid var(--line-2); font-size: 12.5px; }
 .cdev button { width: 24px; height: 24px; border-radius: 50%; border: 0; background: transparent; color: var(--text-2); cursor: pointer; font-size: 16px; line-height: 1; }
@@ -259,8 +263,6 @@ h2, h3 { text-wrap: balance; }
 .fb.brill { box-shadow: 0 0 0 1.5px rgba(92,200,255,.8), 0 0 18px rgba(92,200,255,.28), 0 8px 20px rgba(0,0,0,.28); }
 .fb.marg .ico { background: var(--marg); color: var(--marg-ink); }
 .fb.marg { box-shadow: 0 0 0 1.5px rgba(154,165,160,.55), 0 8px 20px rgba(0,0,0,.28); }
-.fb .l1 em.brill { background: var(--brill); color: var(--brill-ink); }
-.fb .l1 em.marg { background: var(--marg); color: var(--marg-ink); }
 .fbtn { display: inline-block; margin-top: 2px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line-2); background: rgba(5, 20, 14, .82); color: var(--text); font: 700 12px/1.2 var(--f-body); cursor: pointer; }
 .fbtn:hover { background: var(--panel-3); }
 /* a player blackjack glows */
@@ -294,6 +296,13 @@ h2, h3 { text-wrap: balance; }
 .chip:active { transform: translateY(1px); }
 .c5 { --c: var(--chip-5); } .c25 { --c: var(--chip-25); } .c100 { --c: var(--chip-100); } .c500 { --c: var(--chip-500); } .c1000 { --c: var(--chip-1000); }
 .betrow { display: grid; grid-template-columns: 1fr 1fr 2.2fr; gap: 8px; }
+/* how many hands to bet on, when more than one hand is on */
+.spots { display: flex; justify-content: center; align-items: center; gap: 6px; }
+.spots > span { font: 700 12px/1 var(--f-display); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-right: 6px; }
+.spots button { min-width: 46px; height: 34px; border-radius: 10px; border: 1px solid var(--line-2); background: var(--panel-2); color: var(--text-2); font: 700 15px/1 var(--f-mono); cursor: pointer; }
+.spots button:hover { background: var(--panel-3); }
+.spots button.on { background: var(--gold); border-color: var(--gold); color: var(--gold-ink); }
+.spots button:disabled { opacity: .45; cursor: default; }
 .btn { height: 50px; border-radius: 14px; border: 1px solid var(--line-2); background: var(--panel-2); cursor: pointer; font: 700 15px/1 var(--f-display); letter-spacing: .12em; text-transform: uppercase; padding: 0 14px; }
 .btn:hover { background: var(--panel-3); }
 .btn.primary { background: var(--gold); color: var(--gold-ink); border-color: transparent; box-shadow: inset 0 -3px 0 rgba(0,0,0,.2); }
@@ -403,6 +412,8 @@ table.tbl { border-collapse: collapse; width: 100%; font-size: 12.5px; min-width
 .rampgrid label { display: flex; flex-direction: column; gap: 4px; font: 600 11px/1 var(--f-mono); color: var(--muted); text-align: center; min-width: 0; }
 .rampgrid input { width: 100%; box-sizing: border-box; text-align: center; padding: 8px 2px; border-radius: 9px; border: 1px solid var(--line-2); background: var(--panel-3); color: var(--text); font: 700 13px var(--f-mono); }
 .rampgrid input.zero { color: var(--muted); border-style: dashed; }
+.rampgrid select { width: 100%; box-sizing: border-box; padding: 6px 2px; border-radius: 9px; border: 1px solid var(--line-2); background: var(--panel-2); color: var(--gold); font: 700 12.5px var(--f-mono); text-align: center; text-align-last: center; -webkit-appearance: none; appearance: none; cursor: pointer; }
+.rampgrid select.one { color: var(--muted); }
 .presets { display: flex; flex-wrap: wrap; gap: 6px; }
 .risklive { flex: 1 1 100%; min-width: 0; }
 .grid-stats.risk small, .grid-stats small { font-size: 11.5px; color: var(--muted); line-height: 1.3; }
@@ -546,6 +557,10 @@ button.mini:hover { box-shadow: 0 0 0 2px var(--bad); }
 .az-out { display: flex; flex-direction: column; gap: 10px; }
 .az-sum { font-size: 13.5px; color: var(--text-2); }
 .az-sum b { color: var(--text); }
+.az-simline { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-size: 13px; color: var(--text-2); }
+.az-simline b { color: var(--text); font-family: var(--f-mono); font-weight: 700; }
+.az-verdict { margin: 0; padding: 10px 12px; border-radius: 10px; background: var(--panel-2); border: 1px solid var(--line-2); }
+.evt td small.ci { display: block; font: 500 10.5px/1.2 var(--f-mono); color: var(--muted); }
 table.evt { min-width: 0; }
 .evt td, .evt th { white-space: nowrap; }
 .evt tr.best td { background: rgba(70,214,156,.12); }
@@ -1362,7 +1377,8 @@ function actionEVsBin(strat, ctx, b) {
 }
 
 // ---- Monte Carlo simulation: the game dealt card by card, played from the chart with a bet table ----
-// cfg: { rounds, ramp: 14 bets for TC -3..+10 (0 = sit out), opts: decision options, onProgress(frac) }
+// cfg: { rounds, ramp: 14 bets per hand for TC -3..+10 (0 = sit out), hands: 14 numbers of hands to play
+//        (optional, one each), opts: decision options, onProgress(frac) }
 function simulateGame(strat, cfg) {
   const R = strat.rules, decks = R.decks, N = 52 * decks;
   const cutPos = N - Math.round(R.cutDecks * 52), maxH = Math.min(R.maxHands, 8);
@@ -1386,20 +1402,27 @@ function simulateGame(strat, cfg) {
     if (pos >= cutPos) { fresh(); shoes++; }
     const t0 = tcNow(), bin = binOf(t0);
     byTC[bin].dealt++;
-    const bet = ramp[Math.max(-3, Math.min(10, t0)) + 3];
+    const j = Math.max(-3, Math.min(10, t0)) + 3, bet = ramp[j];
     const sitting = !(bet > 0);
-    const b = sitting ? 1 : bet;          // sitting out: the round is still dealt and played the same way
-    const p1 = draw(); see(p1); const up = draw(); see(up); const p2 = draw(); see(p2); const hole = draw();
-    let total = 0, action = b;
+    const b = sitting ? 1 : bet;          // sitting out: the round is still dealt and played the same way, to one hand
+    const n = sitting || !cfg.hands ? 1 : cfg.hands[j];
+    // a card to each of your hands, the upcard, a second card to each hand, the hole card
+    const first = []; for (let s = 0; s < n; s++) { const v = draw(); see(v); first.push(v); }
+    const up = draw(); see(up);
+    const spots = first.map((v) => { const w = draw(); see(w); return [v, w]; });
+    const hole = draw();
+    const isBJ = (c) => (c[0] === 1 && c[1] === 10) || (c[0] === 10 && c[1] === 1);
+    let total = 0, action = n * b;
     let insured = false;
-    if (up === 1) insured = insuranceDecision(strat, tcNow(), opts).value;
+    if (up === 1) insured = insuranceDecision(strat, tcNow(), opts).value;   // one decision for every hand
     const dBJ = (up === 1 && hole === 10) || (up === 10 && hole === 1);
-    const pBJ = (p1 === 1 && p2 === 10) || (p1 === 10 && p2 === 1);
-    if (insured) { total += dBJ ? b : -b / 2; action += b / 2; }
-    if (dBJ) { see(hole); if (!pBJ) total -= b; }
-    else if (pBJ) { see(hole); total += R.bjPays * b; }
+    if (insured) { total += dBJ ? n * b : -n * b / 2; action += n * b / 2; }
+    if (dBJ) { see(hole); for (const c of spots) if (!isBJ(c)) total -= b; }
     else {
-      const hands = [{ c: [p1, p2], split: false, aces: false, bust: false, sur: false, dbl: false }];
+      // blackjacks are paid now; the other hands are played out in order, each split hand right after its parent
+      const hands = [];
+      spots.forEach((c, s) => { if (isBJ(c)) total += R.bjPays * b; else hands.push({ c, spot: s, split: false, aces: false, bust: false, sur: false, dbl: false }); });
+      let onTable = n;                    // splits stop at 8 of your hands, as at the table
       for (let i = 0; i < hands.length; i++) {
         const h = hands[i];
         if (h.c.length === 1) { const v = draw(); see(v); h.c.push(v); }
@@ -1407,16 +1430,17 @@ function simulateGame(strat, cfg) {
           const hi = handInfo(h.c);
           if (hi.total >= 21) break;
           const two = h.c.length === 2, pair = two && h.c[0] === h.c[1];
+          let fromSpot = 0; for (const x of hands) if (x.spot === h.spot) fromSpot++;   // the split rule is per starting hand
           const canHit = !h.aces || R.hsa;
-          const canSplit = pair && hands.length < maxH && (h.c[0] !== 1 || !h.split || R.rsa);
+          const canSplit = pair && fromSpot < maxH && onTable < 8 && (h.c[0] !== 1 || !h.split || R.rsa);
           if (!canHit && !canSplit) break;
           const canDouble = two && !h.aces && (!h.split || R.das) && canDoubleTotal(hi.hard, hi.ace, R);
-          const canSurrender = R.surrender && two && !h.split && hands.length === 1;
+          const canSurrender = R.surrender && two && !h.split && fromSpot === 1;
           const a = decide(strat, { vals: h.c, up, tcInt: tcNow(), canDouble, canSplit, canSurrender, isPair: pair, canHit }, opts).action;
           if (a === 'S') break;
           if (a === 'R') { h.sur = true; break; }
           if (a === 'D') { h.dbl = true; action += b; const v = draw(); see(v); h.c.push(v); if (handInfo(h.c).hard > 21) h.bust = true; break; }
-          if (a === 'P') { const sec = h.c.pop(), aces = sec === 1; h.split = true; h.aces = aces; hands.splice(i + 1, 0, { c: [sec], split: true, aces, bust: false, sur: false, dbl: false }); action += b; const v = draw(); see(v); h.c.push(v); continue; }
+          if (a === 'P') { const sec = h.c.pop(), aces = sec === 1; h.split = true; h.aces = aces; hands.splice(i + 1, 0, { c: [sec], spot: h.spot, split: true, aces, bust: false, sur: false, dbl: false }); onTable++; action += b; const v = draw(); see(v); h.c.push(v); continue; }
           const v = draw(); see(v); h.c.push(v);
           if (handInfo(h.c).hard > 21) { h.bust = true; break; }
         }
@@ -1436,15 +1460,198 @@ function simulateGame(strat, cfg) {
     }
     rounds++;
     if (!sitting) {
-      played++; totalBet += bet; wagered += action; net += total; sumSq += total * total;
-      const bt = byTC[bin]; bt.n++; bt.bet += bet; bt.net += total;
+      played++; totalBet += n * bet; wagered += action; net += total; sumSq += total * total;
+      const bt = byTC[bin]; bt.n++; bt.bet += n * bet; bt.net += total;
     }
     if (cfg.onProgress && rounds % step === 0) cfg.onProgress(rounds / cfg.rounds);
   }
   return { rounds, played, shoes, totalBet, wagered, net, sumSq, byTC };
 }
 
-if (typeof module !== 'undefined') module.exports = { HILO, fullShoe, csum, handInfo, rowKeyOf, compAtTC, roundEV, handEVs, Strategy, decide, insuranceDecision, actionEVs, flipsOf, binOf, KMIN, KMAX, I18_KEYS, seriesFor, handQuestions, handDeviations, inActiveSet, i18Alias, simulateGame, repTC, normCdf };
+// ---- Monte Carlo simulation of one hand at a running count and depth (Analyze hand) ----
+// Each trial deals from a random shoe: the cards already played are a random set whose Hi-Lo count, with
+// your cards and the upcard, makes the running count. Every play is dealt from the same cards (common random
+// numbers), so the gaps between plays are measured closely. Results are after the dealer checks for
+// blackjack. After the first card, hit, stand and double follow the best play for the average shoe at this
+// count; a split resplits whenever the rules allow.
+// cfg: { rules, up, vals, rc, dl: decks left (unseen cards, the hole card included), trials }
+// onBatch(fraction, snapshot) is called as the trials run.
+function simulateHand(cfg, onBatch) {
+  const R = cfg.rules, up = cfg.up, vals = cfg.vals, decks = R.decks, T = 52 * decks;
+  const maxH = Math.min(R.maxHands, 8), known = vals.concat(up);
+  const pool = new Int32Array(11);
+  for (let r = 1; r <= 9; r++) pool[r] = 4 * decks;
+  pool[10] = 16 * decks;
+  let tagK = 0;
+  for (const k of known) { pool[k]--; tagK += HILO[k]; }
+  const U = Math.max(Math.min(T - known.length, 26), Math.min(T - known.length, Math.round(cfg.dl * 52)));
+  const m = T - known.length - U;                         // cards played before this hand
+  const LOW = [2, 3, 4, 5, 6], ZER = [7, 8, 9], HIGH = [1, 10];
+  const gsum = (ranks) => ranks.reduce((a, r) => a + pool[r], 0);
+  const Lp = gsum(LOW), Zp = gsum(ZER), Hp = gsum(HIGH);
+  const LF = new Float64Array(T + 1);
+  for (let i = 1; i <= T; i++) LF[i] = LF[i - 1] + Math.log(i);
+  const lnC = (n, k) => LF[n] - LF[k] - LF[n - k];
+  // the ways to split the played cards into low (l), zero (z) and high (h) cards with l - h = rcp
+  const splitsFor = (rcp) => {
+    const hs = [], ws = [];
+    for (let h = 0; h <= Hp; h++) {
+      const l = h + rcp, z = m - l - h;
+      if (l < 0 || l > Lp || z < 0 || z > Zp) continue;
+      hs.push(h); ws.push(lnC(Lp, l) + lnC(Zp, z) + lnC(Hp, h));
+    }
+    return hs.length ? { hs, ws } : null;
+  };
+  // a count that cannot happen at this depth moves to the nearest one that can
+  let rc = Math.round(cfg.rc), sp = splitsFor(rc - tagK);
+  for (let d = 1; !sp && d <= 2 * T; d++) { if ((sp = splitsFor(rc + d - tagK))) rc += d; else if ((sp = splitsFor(rc - d - tagK))) rc -= d; }
+  const rcp = rc - tagK, top = Math.max(...sp.ws), cdf = [];
+  let acc = 0;
+  for (const w of sp.ws) { acc += Math.exp(w - top); cdf.push(acc); }
+  // the unseen cards of one random shoe, by rank, into u
+  const u = new Int32Array(11), tmp = new Int32Array(11);
+  let uN = 0;
+  // take k random cards from these ranks of src, adding them to dst
+  const take = (src, ranks, k, dst) => {
+    let tot = 0;
+    for (const r of ranks) { tmp[r] = src[r]; tot += src[r]; }
+    for (let i = 0; i < k; i++) {
+      let x = Math.random() * tot, j = 0;
+      while (j < ranks.length - 1 && x >= tmp[ranks[j]]) { x -= tmp[ranks[j]]; j++; }
+      while (tmp[ranks[j]] <= 0) j = j ? j - 1 : ranks.length - 1;   // rounding at the end of the range
+      tmp[ranks[j]]--; tot--; dst[ranks[j]]++;
+    }
+  };
+  const gone = new Int32Array(11);
+  const groupUnseen = (ranks, played) => {
+    const size = ranks.reduce((a, r) => a + pool[r], 0), keep = size - played;
+    for (const r of ranks) { u[r] = 0; gone[r] = 0; }
+    if (keep <= played) take(pool, ranks, keep, u);           // draw whichever side is smaller
+    else { take(pool, ranks, played, gone); for (const r of ranks) u[r] = pool[r] - gone[r]; }
+  };
+  const newShoe = () => {
+    let x = Math.random() * acc, i = 0;
+    while (i < cdf.length - 1 && x >= cdf[i]) i++;
+    const h = sp.hs[i], l = h + rcp, z = m - l - h;
+    groupUnseen(LOW, l); groupUnseen(ZER, z); groupUnseen(HIGH, h);
+    uN = 0; for (let r = 1; r <= 10; r++) uN += u[r];
+  };
+  const excl = up === 1 ? 10 : up === 10 ? 1 : 0;           // the hole card that would make a blackjack
+  // a card from the shoe, skipping rank `skip`; the second loop only runs on rounding at the end of the range
+  const draw = (skip) => {
+    let x = Math.random() * (uN - (skip ? u[skip] : 0)), r = 1;
+    for (; r < 10; r++) { if (r === skip) continue; if (x < u[r]) break; x -= u[r]; }
+    while (u[r] <= 0 || r === skip) r = r === 1 ? 10 : r - 1;
+    u[r]--; uN--;
+    return r;
+  };
+  // the cards after the hole card, drawn as the plays need them; every play reads the same ones
+  const seq = new Int8Array(128), fresh = new Uint8Array(128);
+  let seqLen = 0;
+  const card = (i) => {
+    while (seqLen <= i) {
+      if (uN > 0) { seq[seqLen] = draw(0); fresh[seqLen] = 0; }
+      else { const r = 1 + Math.floor(Math.random() * 13); seq[seqLen] = r > 10 ? 10 : r; fresh[seqLen] = 1; }   // shoe ran out: a fresh deck
+      seqLen++;
+    }
+    return seq[i];
+  };
+  // later decisions: the best play for the average shoe at this count
+  const avg = compAtTC(decks, U / 52, rc / (U / 52), known), t0 = tablesFor(avg, up, R);
+  const hitT = new Uint8Array(64), dblT = new Uint8Array(64);
+  for (let hard = 2; hard <= 21; hard++) for (let ace = 0; ace <= 1; ace++) {
+    const k = hard * 2 + ace, bt = bestTotal(hard, ace);
+    if (bt >= 21) continue;
+    hitT[k] = t0.H[k] > t0.se[bt] ? 1 : 0;
+    if (R.das && canDoubleTotal(hard, ace, R)) dblT[k] = dblFrom(t0, hard, ace) > Math.max(t0.se[bt], t0.H[k]) ? 1 : 0;
+  }
+  let pEnd = 0;
+  const playHits = (hard, ace, i) => {
+    for (;;) {
+      const bt = bestTotal(hard, ace);
+      if (bt > 21) { pEnd = i; return 22; }
+      if (bt === 21 || !hitT[hard * 2 + ace]) { pEnd = i; return bt; }
+      const c = card(i++); hard += c; if (c === 1) ace = 1;
+    }
+  };
+  const dealer = (hole, i) => {
+    let hard = up + hole, ace = up === 1 || hole === 1 ? 1 : 0;
+    for (;;) {
+      const soft = ace && hard + 10 <= 21, best = soft ? hard + 10 : hard;
+      if (best > 21) return 22;
+      if (best >= 17 && !(best === 17 && soft && !R.s17)) return best;
+      const c = card(i++); hard += c; if (c === 1) ace = 1;
+    }
+  };
+  const res = (pt, dt) => (pt > 21 ? -1 : dt > 21 || pt > dt ? 1 : pt < dt ? -1 : 0);
+  const hi = handInfo(vals), two = vals.length === 2, pair = two && vals[0] === vals[1];
+  const natural = two && hi.total === 21;
+  const acts = [];
+  if (!natural) {
+    acts.push('S');
+    if (hi.total < 21) {
+      acts.push('H');
+      if (two && canDoubleTotal(hi.hard, hi.ace, R)) acts.push('D');
+    }
+    if (pair) acts.push('P');
+  }
+  const st = {};
+  for (const a of acts) st[a] = { n: 0, sum: 0, sq: 0, w: 0, p: 0, l: 0, hands: 0 };
+  const dd = [0, 0, 0, 0, 0, 0];
+  let pBJ = 0, n = 0;
+  const trials = Math.max(1, cfg.trials | 0), perShoe = 4, batch = 20000;
+  // sums of products of two plays' results in the same trial, for the error of the gap between them
+  const K = acts.length, xs = new Float64Array(K), cross = new Float64Array(K * K);
+  const outcome = (s, v, mult) => { s.hands++; if (v > 0) s.w++; else if (v < 0) s.l++; else s.p++; return v * mult; };
+  const add = (s, x) => { s.n++; s.sum += x; s.sq += x * x; xs[acts.indexOf(s.a)] = x; };
+  for (const a of acts) st[a].a = a;
+  const snapshot = () => ({ trials: n, rc, unseen: U, played: m, order: acts.slice(), cross: Array.from(cross), acts: JSON.parse(JSON.stringify(st)), dd: dd.slice(), pBJ: n ? pBJ / n : 0 });
+  while (n < trials) {
+    if (n % perShoe === 0) newShoe();
+    // the hole card, given the dealer has no blackjack
+    pBJ += excl ? u[excl] / uN : 0;
+    const hole = draw(excl);
+    seqLen = 0;
+    const p0 = bestTotal(hi.hard, hi.ace);
+    let dStand = 0;
+    if (st.S) { dStand = dealer(hole, 0); dd[dStand > 21 ? 5 : dStand - 17]++; add(st.S, outcome(st.S, res(p0, dStand), 1)); }
+    if (st.H) {
+      const c = card(0), pt = playHits(hi.hard + c, hi.ace || c === 1 ? 1 : 0, 1);
+      add(st.H, outcome(st.H, res(pt, pt > 21 ? 0 : dealer(hole, pEnd)), 1));
+    }
+    if (st.D) {
+      const c = card(0), h2 = hi.hard + c, pt = bestTotal(h2, hi.ace || c === 1 ? 1 : 0);
+      add(st.D, outcome(st.D, res(pt > 21 ? 22 : pt, pt > 21 ? 0 : dealer(hole, 1)), 2));
+    }
+    if (st.P) {
+      const x0 = vals[0], ends = [], mults = [];
+      let pending = 2, made = 2, i = 0;
+      while (pending > 0) {
+        pending--;
+        let c = card(i++);
+        while (c === x0 && made < maxH && (x0 !== 1 || R.rsa)) { made++; pending++; c = card(i++); }
+        let hard = x0 + c, ace = x0 === 1 || c === 1 ? 1 : 0, mult = 1, pt;
+        if (x0 === 1 && !R.hsa) pt = bestTotal(hard, ace);
+        else if (x0 !== 1 && dblT[hard * 2 + ace]) { const c2 = card(i++); hard += c2; if (c2 === 1) ace = 1; pt = bestTotal(hard, ace); if (pt > 21) pt = 22; mult = 2; }
+        else { pt = playHits(hard, ace, i); i = pEnd; }
+        ends.push(pt); mults.push(mult);
+      }
+      const dt = ends.some((pt) => pt <= 21) ? dealer(hole, i) : 0;
+      let tot = 0;
+      for (let k = 0; k < ends.length; k++) tot += outcome(st.P, res(ends[k], dt), mults[k]);
+      add(st.P, tot);
+    }
+    for (let i = 0; i < K; i++) for (let j = i + 1; j < K; j++) cross[i * K + j] += xs[i] * xs[j];
+    // put the cards back for the next deal from this shoe
+    u[hole]++; uN++;
+    for (let i = 0; i < seqLen; i++) if (!fresh[i]) { u[seq[i]]++; uN++; }
+    n++;
+    if (onBatch && n % batch === 0 && n < trials) onBatch(n / trials, snapshot());
+  }
+  return snapshot();
+}
+
+if (typeof module !== 'undefined') module.exports = { HILO, fullShoe, csum, handInfo, rowKeyOf, compAtTC, roundEV, handEVs, Strategy, decide, insuranceDecision, actionEVs, flipsOf, binOf, KMIN, KMAX, I18_KEYS, seriesFor, handQuestions, handDeviations, inActiveSet, i18Alias, simulateGame, simulateHand, repTC, normCdf, compAtTC, tablesFor, handEVs };
 
 </script>
 <script>
@@ -1468,9 +1675,12 @@ const DEFAULTS = {
   tcMode: 'floor', deckEst: 'exact',
   useDevs: false, devMode: 'adv', devRange: 8, customDevs: [], feedback: 'all', hint: false, pauseOnMistake: false, showBank: true,
   betMode: 'manual', unit: 25, rampBets: [25, 25, 25, 25, 50, 100, 150, 200, 200, 200, 200, 200, 200, 200], gradeBets: true, startBankroll: 10000,
+  // more than one hand a round: how many (1 to MAX_SPOTS) at each true count of the bet table
+  multiHands: false, rampHands: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   riskBank: 10000, rph: 100, tripHours: 4,
   bots: 0, speed: 'normal', countCheck: true, randomChecks: false,
 };
+const MAX_SPOTS = 4;
 // the bet table has one entry per true count: TC -3 or lower, -2 ... +9, +10 or higher
 const RAMP_TCS = [-3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const RAMP_LABELS = ['\u2264\u22123', '\u22122', '\u22121', '0', '+1', '+2', '+3', '+4', '+5', '+6', '+7', '+8', '+9', '\u2265+10'];
@@ -1479,7 +1689,7 @@ function sanitize(src) {
   const o = Object.assign({}, DEFAULTS, src || {});
   const pick = (v, list, d) => (list.includes(v) ? v : d);
   o.decks = pick(+o.decks, [1, 2, 4, 6, 8], DEFAULTS.decks);
-  for (const k of ['s17', 'das', 'surrender', 'rsa', 'hsa', 'burn', 'hint', 'pauseOnMistake', 'gradeBets', 'countCheck', 'randomChecks', 'useDevs', 'showBank']) o[k] = !!o[k];
+  for (const k of ['s17', 'das', 'surrender', 'rsa', 'hsa', 'burn', 'hint', 'pauseOnMistake', 'gradeBets', 'countCheck', 'randomChecks', 'useDevs', 'showBank', 'multiHands']) o[k] = !!o[k];
   o.maxHands = pick(+o.maxHands, [2, 3, 4, 99], DEFAULTS.maxHands);
   o.bjPays = +o.bjPays === 1.2 ? 1.2 : 1.5;
   o.doubleOn = pick(o.doubleOn, ['any', '9-11', '10-11'], 'any');
@@ -1499,6 +1709,8 @@ function sanitize(src) {
     : DEFAULTS.rampBets;
   rb = rb.map((x) => Math.min(100000, Math.max(0, Math.round((+x || 0) / 5) * 5)));
   o.rampBets = rb.some((x) => x > 0) ? rb : DEFAULTS.rampBets.slice();
+  const rh = Array.isArray(o.rampHands) && o.rampHands.length === RAMP_TCS.length ? o.rampHands : DEFAULTS.rampHands;
+  o.rampHands = rh.map((n) => Math.min(MAX_SPOTS, Math.max(1, Math.round(+n || 1))));
   delete o.ramp;
   o.riskBank = Math.min(1e7, Math.max(100, Math.round(+o.riskBank || 10000)));
   o.rph = Math.min(400, Math.max(10, Math.round(+o.rph || 100)));
@@ -1521,9 +1733,10 @@ function loadSettings() {
 let settings = loadSettings();
 
 // ---------- formatting ----------
-function fmt$(x, signed) {
+// "$25", "$7.50"; signed adds + or −, and withCents always shows the cents ("+$5.00")
+function fmt$(x, signed, withCents) {
   const v = Math.round(x * 100) / 100, a = Math.abs(v);
-  const s = a.toLocaleString('en-US', { minimumFractionDigits: (Math.round(a * 100) % 100) ? 2 : 0, maximumFractionDigits: 2 });
+  const s = a.toLocaleString('en-US', { minimumFractionDigits: withCents || (Math.round(a * 100) % 100) ? 2 : 0, maximumFractionDigits: 2 });
   if (signed) return (v > 0 ? '+' : v < 0 ? '−' : '') + '$' + s;
   return (v < 0 ? '−' : '') + '$' + s;
 }
@@ -1573,7 +1786,17 @@ function stratRules() {
 }
 // The index set in force: the chosen set when deviations are on, otherwise basic strategy only.
 const devModeNow = () => (settings.useDevs ? settings.devMode : 'bs');
-const decOpts = () => ({ mode: devModeNow(), range: settings.devRange, ramp: settings.rampBets, custom: settings.customDevs });
+const decOpts = () => ({ mode: devModeNow(), range: settings.devRange, ramp: rampMoney(), custom: settings.customDevs });
+// The hands at each true count of the bet table, or null while you play one hand.
+const rampHandsOn = () => (settings.multiHands ? settings.rampHands : null);
+// Dollars out at each true count of the bet table: the bet times the hands you play there. Index plays are
+// valued with it. The same array comes back until the settings change, so the rankings stay cached.
+let moneyMemo = null;
+function rampMoney() {
+  const b = settings.rampBets, h = rampHandsOn();
+  if (!moneyMemo || moneyMemo.b !== b || moneyMemo.h !== h) moneyMemo = { b, h, out: h ? b.map((x, i) => x * h[i]) : b };
+  return moneyMemo.out;
+}
 const schedule = (fn) => (window.requestIdleCallback ? requestIdleCallback(fn, { timeout: 60 }) : setTimeout(fn, 8));
 let pumpOn = false, fillWorker = null, workerUrl = '';
 const WORKER_GLUE = [
@@ -1589,7 +1812,7 @@ const WORKER_GLUE = [
   '  } else if (m.type === "sim" && ST) {',
   '    var out = [];',
   '    m.jobs.forEach(function (job, j) {',
-  '      out.push(simulateGame(ST, { rounds: job.rounds, ramp: job.ramp, opts: job.opts, onProgress: function (f) { postMessage({ type: "simProgress", id: m.id, p: (j + f) / m.jobs.length }); } }));',
+  '      out.push(simulateGame(ST, { rounds: job.rounds, ramp: job.ramp, hands: job.hands, opts: job.opts, onProgress: function (f) { postMessage({ type: "simProgress", id: m.id, p: (j + f) / m.jobs.length }); } }));',
   '    });',
   '    postMessage({ type: "simDone", id: m.id, results: out });',
   '  }',
@@ -1728,8 +1951,12 @@ function tcIntOf(t) {
 }
 const tcNow = () => tcIntOf(tcExact());
 const rampBet = (k) => settings.rampBets[Math.max(-3, Math.min(10, k)) + 3];
+// Hands to play at true count k: your bet table's number when more than one hand is on, otherwise one.
+const rampSpots = (k) => (settings.multiHands ? settings.rampHands[Math.max(-3, Math.min(10, k)) + 3] : 1);
 const unitsTxt = (b) => { const u = Math.round((b / settings.unit) * 10) / 10; return u + (u === 1 ? ' unit' : ' units'); };
-const rampTxt = (b) => (b > 0 ? fmt$(b) + ' \u00b7 ' + unitsTxt(b) : 'Sit out');
+// "$25", or "2 \u00d7 $25" for more than one hand
+const betTxt = (b, n) => (n > 1 ? n + ' \u00d7 ' + fmt$(b) : fmt$(b));
+const rampTxt = (b, n) => (b > 0 ? betTxt(b, n) + ' \u00b7 ' + unitsTxt(b) + (n > 1 ? ' each' : '') : 'Sit out');
 
 function newShoeStats() {
   return { no: session.shoes.length + 1, rules: rulesText(settings, true), rulesFull: rulesText(settings), rounds: 0, hands: 0, wagered: 0, initial: 0, net: 0, ev: 0,
@@ -1742,7 +1969,7 @@ function newShoe() {
   round = null; cutNotice = false; lastFeedback = null; banner = '';
   for (const s of seats) s.hands = [];
   clearTableDom();
-  if (autoBetOn()) bet = rampBet(0);
+  if (autoBetOn()) followRamp(0);
   render();
 }
 
@@ -1762,21 +1989,25 @@ function syncSeats() {
 
 // ---------- hands ----------
 let hidSeq = 0;
-function newHand(b, o = {}) { return { id: ++hidSeq, cards: [], bet: b, doubled: false, done: false, busted: false, surrendered: false, bj: false, fromSplit: !!o.fromSplit, splitAces: !!o.splitAces, result: null, net: 0 }; }
+// spot: which of your starting hands this is (or came from, after a split)
+function newHand(b, o = {}) { return { id: ++hidSeq, cards: [], bet: b, spot: o.spot || 0, doubled: false, done: false, busted: false, surrendered: false, bj: false, fromSplit: !!o.fromSplit, splitAces: !!o.splitAces, result: null, net: 0 }; }
 const valsOf = (h) => h.cards.map((c) => c.v);
 const infoOf = (h) => handInfo(valsOf(h));
 const isNatural = (h) => h.cards.length === 2 && !h.fromSplit && infoOf(h).total === 21;
 const maxHandsGame = () => Math.min(settings.maxHands, 8);
+// Splits never take the table past this many of your hands, so they all fit (the split rule allows 8 at most).
+const TABLE_HANDS = 8;
 function allowedFor(h, hands) {
   const v = valsOf(h), hi = handInfo(v);
   if (h.done || hi.total >= 21) return [];
   const two = v.length === 2, pair = two && v[0] === v[1];
+  const fromSpot = hands.filter((x) => x.spot === h.spot).length;   // the split rule counts the hands from one starting hand
   const acts = [];
   if (!h.splitAces || settings.hsa) acts.push('H');
   acts.push('S');
   if (two && !h.splitAces && (!h.fromSplit || settings.das) && canDoubleTotal(hi.hard, hi.ace, stratRules())) acts.push('D');
-  if (pair && hands.length < maxHandsGame() && (v[0] !== 1 || !h.fromSplit || settings.rsa)) acts.push('P');
-  if (settings.surrender && two && !h.fromSplit && hands.length === 1) acts.push('R');
+  if (pair && fromSpot < maxHandsGame() && hands.length < TABLE_HANDS && (v[0] !== 1 || !h.fromSplit || settings.rsa)) acts.push('P');
+  if (settings.surrender && two && !h.fromSplit && fromSpot === 1) acts.push('R');
   return acts;
 }
 function ctxFor(h, acts) {
@@ -1828,6 +2059,19 @@ function devPhrase(type, start, flips, R) {
   if (cur !== null) ranges.push([cur, R]);
   return yes + ' at ' + ranges.map(([a, b]) => (a === -R ? `TC \u2264 ${sgn(b)}` : b === R ? `TC \u2265 ${sgn(a)}` : a === b ? `TC ${sgn(a)}` : `TC ${sgn(a)} to ${sgn(b)}`)).join(' or ');
 }
+// The index plays in your set for these chart questions, for the feedback's last row:
+// "Surrender at TC \u2265 +3 \u00b7 Stand at TC \u2265 0", or "none". Empty while deviations are off.
+function devsText(qs) {
+  const o = decOpts();
+  if (o.mode === 'bs') return '';
+  const out = [];
+  for (const q of qs) {
+    if (!inActiveSet(strat, q, o)) continue;
+    const f = flipsOf(seriesFor(strat, q).series, o.range);
+    if (f.flips.length) out.push(devPhrase(q.type, f.start, f.flips, o.range));
+  }
+  return out.length ? out.join(' \u00b7 ') : 'none';
+}
 function explain(best, action) {
   const st = (t) => best.steps.find((s) => s.q.type === t);
   let pickStep = null;
@@ -1851,6 +2095,7 @@ function resolveWait(kind, v) { const f = waiters[kind]; if (f) { delete waiters
 // ---------- table state for rendering ----------
 let phase = 'boot';
 let bet = Math.max(1, Number(store.get('bet', 0)) || settings.unit);
+let spots = Math.min(MAX_SPOTS, Math.max(1, Math.round(Number(store.get('spots', 1)) || 1)));   // hands you bet on, when more than one is on
 let countVisible = store.get('countVisible', true) !== false;
 let peeking = false;
 let pendingRules = false;
@@ -1867,6 +2112,9 @@ let paused = null;        // your shoe game, set aside while another mode runs
 let test = null;          // the test game in progress
 let review = null;        // review mode: the scenario being dealt and the score
 const autoBetOn = () => settings.betMode === 'auto' && (tableMode === 'play' || tableMode === 'random');
+// The hands you bet on this round. Review hands are dealt to one.
+const spotsNow = () => (settings.multiHands && tableMode !== 'review' ? spots : 1);
+function followRamp(k) { bet = rampBet(k); spots = rampSpots(k); }
 const hintOn = () => settings.hint && tableMode !== 'test';
 // Playing feedback shows only while the count is showing (review always shows it; a test never does).
 const fbShown = () => tableMode === 'review' || (tableMode !== 'test' && settings.feedback !== 'off' && countVisible);
@@ -1905,31 +2153,34 @@ async function playRound() {
   const pre = { rc: count.rc, tc: tcExact(), decks: decksLeft() };
   pre.tcI = tcIntOf(pre.tc);
   pre.edge = strat.edgeAt(pre.tc);
-  const sitting = !(bet > 0);
-  const r = round = { no: shoeStats.dealt + 1, dealer: { cards: [], holeHidden: true, holeId: -1 }, hands: [], active: -1, insurance: null, bet: sitting ? 0 : bet, pre,
-    ev: sitting ? 0 : bet * pre.edge, net: 0, done: false, sitOut: sitting };
+  const sitting = !(bet > 0), n = sitting ? 0 : spotsNow();
+  // bet is per hand; stake is what goes out before the deal, on all your hands
+  const r = round = { no: shoeStats.dealt + 1, dealer: { cards: [], holeHidden: true, holeId: -1 }, hands: [], active: -1, insurance: null, bet: sitting ? 0 : bet,
+    spots: n, stake: sitting ? 0 : bet * n, pre, ev: sitting ? 0 : bet * n * pre.edge, net: 0, done: false, sitOut: sitting };
   shoeStats.maxTC = shoeStats.maxTC === null ? pre.tcI : Math.max(shoeStats.maxTC, pre.tcI);
   shoeStats.minTC = shoeStats.minTC === null ? pre.tcI : Math.min(shoeStats.minTC, pre.tcI);
   lastFeedback = null; banner = '';
   phase = 'deal';
   clearTableDom();
   // bet sizing check
-  r.rampBet = rampBet(pre.tcI);
+  r.rampBet = rampBet(pre.tcI); r.rampSpots = rampSpots(pre.tcI);
   if (!autoBetOn() && tableMode !== 'review' && (settings.gradeBets || tableMode === 'test')) {
-    const ok = Math.abs(r.bet - r.rampBet) < 0.005;
-    shoeStats.bets.push({ round: r.no, bet: r.bet, ramp: r.rampBet, tcI: pre.tcI, ok });
+    // on the ramp: its bet per hand, and when you play, its number of hands
+    const ok = Math.abs(r.bet - r.rampBet) < 0.005 && (sitting || n === r.rampSpots);
+    const chk = { round: r.no, bet: r.bet, ramp: r.rampBet, spots: n, rampSpots: r.rampSpots, tcI: pre.tcI, ok };
+    shoeStats.bets.push(chk);
     if (tableMode === 'play') { session.tot.bets++; if (ok) session.tot.betsOk++; }
-    if (tableMode === 'test') test.bets.push({ bet: r.bet, ramp: r.rampBet, tcI: pre.tcI, ok });
-    else if (!ok && settings.feedback !== 'off') banner = betCheckText(r.rampBet, r.bet, pre.tcI);
+    if (tableMode === 'test') test.bets.push(chk);
+    else if (!ok && settings.feedback !== 'off') banner = betCheckText(r.rampBet, r.rampSpots, r.bet, n, pre.tcI);
   }
   syncSeats();
   const you = seats.find((s) => s.kind === 'you');
-  r.hands = you.hands = sitting ? [] : [newHand(bet)];
+  r.hands = you.hands = sitting ? [] : Array.from({ length: n }, (_, i) => newHand(bet, { spot: i }));
   if (sitting && !seats.some((s) => s.kind === 'bot')) seats.splice(seats.indexOf(you) + 1, 0, { kind: 'bot', name: 'Other player', hands: [], active: -1, phantom: true });
   for (const s of seats) if (s.kind === 'bot') { s.hands = [newHand(settings.unit)]; s.active = -1; }
   render();
   for (let pass = 0; pass < 2; pass++) {
-    for (const s of seats) if (s.hands.length) await dealTo(s.hands[0]);
+    for (const s of seats) for (const h of s.hands) await dealTo(h);
     await dealDealer(pass === 1);
   }
   const up = r.dealer.cards[0].v, hole = r.dealer.cards[1];
@@ -1956,18 +2207,20 @@ async function playRound() {
   settle(false);
 }
 
-function betCheckText(ramp, b, k) {
+function betCheckText(ramp, rampN, b, n, k) {
   const at = countVisible ? ` at TC ${sgn(k)}` : '';
-  if (ramp <= 0) return `Bet check: your ramp sits out${at}, you bet ${fmt$(b)}`;
-  if (b <= 0) return `Bet check: your ramp bets ${fmt$(ramp)}${at}, you sat out`;
-  return `Bet check: the ramp bet was ${fmt$(ramp)}${at}, you bet ${fmt$(b)}`;
+  if (ramp <= 0) return `Bet check: your ramp sits out${at}, you bet ${betTxt(b, n)}`;
+  if (b <= 0) return `Bet check: your ramp bets ${betTxt(ramp, rampN)}${at}, you sat out`;
+  return `Bet check: the ramp bet was ${betTxt(ramp, rampN)}${at}, you bet ${betTxt(b, n)}`;
 }
+// One insurance decision covers all your hands: half the stake on all of them, or none. It is even money
+// when every hand is a blackjack.
 async function insurancePhase() {
-  const r = round, h = r.hands[0];
+  const r = round, h = r.hands[0], stake = r.stake, even = r.hands.every(isNatural);
   await waitForIndices();
   const tcI = tcNow(), tcX = tcTrue();
   const dec = insuranceDecision(strat, tcI, decOpts());
-  r.insOffer = { natural: isNatural(h), amount: h.bet / 2, best: dec.value };
+  r.insOffer = { natural: even, amount: stake / 2, best: dec.value, hands: r.hands.length };
   phase = 'insurance';
   render();
   const take = await waitFor('ins');
@@ -1984,7 +2237,7 @@ async function insurancePhase() {
   const lossU = ok ? 0 : Math.max(0, ev(chart, evIns) - ev(take, evIns));
   const idxGainU = isDev ? ev(chart, evIns) - ev(dec.bs, evIns) : 0;
   const topTake = evIns > 0, altU = ev(topTake, evIns) - ev(chart, evIns);
-  const alt = topTake !== take && altU > BETTER_EPS ? { action: topTake ? 'I' : 'N', gainU: altU, gain: altU * h.bet } : null;
+  const alt = topTake !== take && altU > BETTER_EPS ? { action: topTake ? 'I' : 'N', gainU: altU, gain: altU * stake } : null;
   // for a right call: the other choice, and the nearest count where it would be right
   let second = null;
   if (ok) {
@@ -1993,13 +2246,15 @@ async function insurancePhase() {
     second = { action: take ? 'N' : 'I', evU: ev(!take, evIns), diffU: ev(!take, evIns) - ev(take, evIns), at, up: at !== null && at > k };
   }
   const u = r.dealer.cards[0];
-  const rec = { kind: 'ins', round: r.no, hand: (isNatural(h) ? 'Even money' : 'Insurance') + ' v A', cs: h.cards.map((c) => [c.r, c.s]), ucs: [u.r, u.s],
-    vals: valsOf(h), up: 1, sk: 'ins', tcI, tcX, dl: decksLeft(), action: take ? 'I' : 'N', correct: chart ? 'I' : 'N', bsAct: 'N', grade: g, ok, isDev, brill, bet: h.bet,
-    rule: ruleText('I', dec.series, dec.bs, dec.viaIndex), lossU, loss: lossU * h.bet, even: isNatural(h), idxGainU, idxGain: idxGainU * h.bet, alt, add: null, second,
+  // bet is the stake on all your hands, so the EVs and the cost are for insuring every one of them
+  const rec = { kind: 'ins', round: r.no, hand: (even ? 'Even money' : 'Insurance') + ' v A', cs: h.cards.map((c) => [c.r, c.s]), ucs: [u.r, u.s],
+    vals: valsOf(h), up: 1, sk: 'ins', tcI, tcX, dl: decksLeft(), action: take ? 'I' : 'N', correct: chart ? 'I' : 'N', bsAct: 'N', grade: g, ok, isDev, brill, bet: stake,
+    rule: ruleText('I', dec.series, dec.bs, dec.viaIndex), lossU, loss: lossU * stake, even, idxGainU, idxGain: idxGainU * stake, alt, add: null, second,
+    devs: devsText([{ type: 'I', key: 'I:ins' }]),
     why: brill && brill.kind === 'chart' ? (devModeNow() === 'bs' ? 'Insurance is an index play, and deviations are off in Settings' : `Its index is outside your ±${settings.devRange} range`) : '',
-    evs: { I: evIns, N: 0 }, evBest: ev(chart, evIns) * h.bet, evMine: ev(take, evIns) * h.bet };
+    evs: { I: evIns, N: 0 }, evBest: ev(chart, evIns) * stake, evMine: ev(take, evIns) * stake };
   record(rec);
-  if (take) r.insurance = { amount: h.bet / 2 };
+  if (take) r.insurance = { amount: stake / 2 };
   render();
 }
 
@@ -2066,7 +2321,7 @@ async function applyAction(h, a, hands) {
   } else if (a === 'P') {
     const second = h.cards.pop();
     const aces = second.v === 1;
-    const h2 = newHand(h.bet, { fromSplit: true, splitAces: aces });
+    const h2 = newHand(h.bet, { fromSplit: true, splitAces: aces, spot: h.spot });
     h2.cards.push(second);
     h.fromSplit = true; h.splitAces = aces;
     hands.splice(hands.indexOf(h) + 1, 0, h2);
@@ -2121,13 +2376,13 @@ function settle(dealerBJ) {
   ss.dealt++;
   if (r.sitOut) ss.sat++;
   else {
-    ss.rounds++; ss.hands += r.hands.length; ss.wagered += wag; ss.initial += r.bet; ss.net += net; ss.ev += r.ev;
+    ss.rounds++; ss.hands += r.hands.length; ss.wagered += wag; ss.initial += r.stake; ss.net += net; ss.ev += r.ev;
     if (money) {
-      tt.rounds++; tt.hands += r.hands.length; tt.wagered += wag; tt.initial += r.bet; tt.net += net; tt.ev += r.ev;
+      tt.rounds++; tt.hands += r.hands.length; tt.wagered += wag; tt.initial += r.stake; tt.net += net; tt.ev += r.ev;
       const last = session.series[session.series.length - 1];
       session.series.push([tt.rounds, Math.round((last[1] + net) * 100) / 100, Math.round((last[2] + r.ev) * 100) / 100]);
     }
-    if (tableMode === 'test') { test.net += net; test.ev += r.ev; test.wagered += wag; test.initial += r.bet; }
+    if (tableMode === 'test') { test.net += net; test.ev += r.ev; test.wagered += wag; test.initial += r.stake; }
     if (tableMode !== 'review') { mem.hands++; saveMem(); }
   }
   if (money) saveSession();
@@ -2223,7 +2478,7 @@ function grade(h, ctx, best, action) {
     rule: explain(best, action), lossU, loss: lossU * h.bet, idxGainU, idxGain: idxGainU * h.bet, alt,
     why: brill && brill.kind === 'chart' ? offChartWhy(questionFor(ctx, action, chart)) : '',
     add: brill && brill.kind !== 'rare' ? addOffer(ctx, action, chart) : alt ? addOffer(ctx, top, chart) : null,
-    second: ok ? secondBest(ctx, action, acts, evs) : null,
+    second: ok ? secondBest(ctx, action, acts, evs) : null, devs: devsText(handQuestions(strat, ctx)),
     evs: Object.fromEntries(acts.map((a) => [a, evs[a]])), evBest: evOf(chart) * h.bet, evMine: evOf(action) * h.bet };
   record(rec);
   return rec;
@@ -2243,18 +2498,20 @@ function addOffer(ctx, play, chartPlay) {
   const q = questionFor(ctx, play, chartPlay);
   if (!strat.cells[q.cellKey] || inActiveSet(strat, q, o)) return null;
   if (decide(strat, ctx, Object.assign({}, o, { custom: o.custom.concat(q.key) })).action !== play) return null;
-  return { key: q.key, label: customDevLabel(q.key) };
+  return { key: q.key, label: customDevLabel(q.key), rule: customDevRule(q.key) };
 }
-// "9 v 2: Double at TC ≥ +1"
-function customDevLabel(key) {
+// "Double at TC ≥ +1"
+function customDevRule(key) {
   const t = key[0], ck = key.slice(2);
   const cell = strat && strat.cells[ck];
   if (cell && cell.bins) {
     const f = flipsOf(seriesFor(strat, { type: t, cellKey: ck }).series, settings.devRange);
-    if (f.flips.length) return cellLabel(ck) + ': ' + devPhrase(t, f.start, f.flips);
+    if (f.flips.length) return devPhrase(t, f.start, f.flips);
   }
-  return cellLabel(ck) + ': ' + { S: 'stand or hit', D: 'double', P: 'split', R: 'surrender' }[t];
+  return { S: 'stand or hit', D: 'double', P: 'split', R: 'surrender' }[t];
 }
+// "9 v 2: Double at TC ≥ +1"
+function customDevLabel(key) { return cellLabel(key.slice(2)) + ': ' + customDevRule(key); }
 function addCustomDev(key, label) {
   if (settings.customDevs.includes(key)) return;
   settings = sanitize(Object.assign({}, settings, { customDevs: settings.customDevs.concat(key) }));
@@ -2347,10 +2604,10 @@ function pickWeighted(list, wf) {
 let toughCache = null;
 function toughPool() {
   if (!strat || !strat.ready) return [];
-  const sig = JSON.stringify(stratRules()) + settings.rampBets.join(',');
+  const sig = JSON.stringify(stratRules()) + rampMoney().join(',');
   if (toughCache && toughCache.sig === sig) return toughCache.list;
   const list = [];
-  for (const q of strat.rankIndexPlays(8, settings.rampBets).list.slice(0, 40)) {
+  for (const q of strat.rankIndexPlays(8, rampMoney()).list.slice(0, 40)) {
     const s = q.type === 'I' ? strat.ins : seriesFor(strat, q).series;
     for (const f of flipsOf(s, 8).flips) list.push({ sk: q.type === 'I' ? 'ins' : q.cellKey, at: f.at, w: 1 });
   }
@@ -2629,7 +2886,7 @@ async function mainLoop() {
     syncSeats();
     if (round && round.done) phase = 'settled'; else phase = 'bet';
     prepareBet();   // random and review modes move to their next spot; the last hand stays on the table
-    if (autoBetOn()) bet = rampBet(tcNow());
+    if (autoBetOn()) followRamp(tcNow());
     render();
     if (tableMode === 'play' && settings.randomChecks && shoeStats.dealt >= 3 && Math.random() < 0.14) await countCheck('mid');
     await waitFor('deal');
@@ -2640,7 +2897,7 @@ async function mainLoop() {
 const betLocked = () => autoBetOn() || tableMode === 'review';
 function onDeal() {
   if (modal || screen !== 'table' || !(phase === 'bet' || phase === 'settled')) return;
-  if (tableMode === 'play') store.set('bet', bet);
+  if (tableMode === 'play') { store.set('bet', bet); store.set('spots', spots); }
   resolveWait('deal');
 }
 function onAct(a) {
@@ -2654,6 +2911,11 @@ function addChip(v) {
   renderTable(); renderDock();
 }
 function clearBet() { if (!(phase === 'bet' || phase === 'settled') || betLocked()) return; bet = 0; renderTable(); renderDock(); }
+function setSpots(n) {
+  if (!(phase === 'bet' || phase === 'settled') || betLocked() || !settings.multiHands) return;
+  spots = Math.min(MAX_SPOTS, Math.max(1, n));
+  renderTable(); renderDock();
+}
 
 // ---------- rendering ----------
 function clearTableDom() {
@@ -2844,7 +3106,7 @@ function renderTable() {
     return;
   }
   if (!r || !r.hands.length) {
-    pz.className = 'player-zone';
+    pz.className = 'player-zone' + (bet > 0 && spotsNow() >= 3 ? ' many' : '');
     pz.innerHTML = betSpotHTML();
     return;
   }
@@ -2885,7 +3147,8 @@ function chipStackHTML(amount) {
 }
 function betSpotHTML() {
   if (!(bet > 0)) return '<div class="betspot"><div class="betring sit"><span>Sit out</span></div><span class="betamt">Watch the next round</span></div>';
-  return `<div class="betspot"><div class="betring"><div class="chipstack">${chipStackHTML(bet)}</div></div><span class="betamt">${fmt$(bet)}</span></div>`;
+  const ring = `<div class="betring"><div class="chipstack">${chipStackHTML(bet)}</div></div>`;
+  return `<div class="betspot"><div class="rings">${ring.repeat(spotsNow())}</div><span class="betamt">${betTxt(bet, spotsNow())}</span></div>`;
 }
 
 const cents = (x, signed) => (Math.abs(x) >= 0.005 ? fmt$(x, signed) : 'under 1¢');
@@ -2906,13 +3169,6 @@ function costText(rec) {
 function whenText(rec, s) {
   if (s.at === null) return `never the best play between TC ${sgn(KMIN)} and ${sgn(KMAX)}`;
   return `you’d ${verbOf(rec, s.action)} at TC ${s.up ? '≥' : '≤'} ${sgn(s.at)}`;
-}
-// "Index gain +2.6% (+$0.66) over basic strategy's hit · you'd hit at TC ≤ +1"
-function idxGainText(rec) {
-  const bs = rec.kind === 'ins' ? (rec.correct === 'I' ? 'declining it' : 'taking it') : 'basic strategy’s ' + ACT[rec.bsAct].toLowerCase();
-  const s = rec.second;
-  const when = s && s.action === rec.bsAct ? ' · ' + esc(whenText(rec, s)) : '';
-  return `Index gain <b>${pct(rec.idxGainU, 1)}</b> (${cents(rec.idxGain, true)}) over ${esc(bs)}${when}`;
 }
 // "2nd best: Hit −23.8% (2.6% less) · you'd hit at TC ≤ +1"
 function secondText(rec) {
@@ -2939,26 +3195,24 @@ function brillText(rec) {
   }
   return `Worth <b>${(b.gainU * 100).toFixed(1)}%</b> (${cents(b.gainU * rec.bet)}) more than ${esc(chart)} at this count.${rec.why ? ' ' + esc(rec.why) + '.' : ''}`;
 }
-function addBtnHTML(add) {
+// short: the compact form that sits in the feedback's deviations row
+function addBtnHTML(add, short) {
   if (!add) return '';
-  if (settings.customDevs.includes(add.key)) return `<span class="addv done">In your deviations: ${esc(add.label)} ✓</span>`;
-  return `<button type="button" class="addv" data-adddev="${esc(add.key)}" data-label="${esc(add.label)}">+ Add to my deviations: ${esc(add.label)}</button>`;
+  if (settings.customDevs.includes(add.key)) return `<span class="addv done${short ? ' sm' : ''}">${short ? 'Added ✓' : `In your deviations: ${esc(add.label)} ✓`}</span>`;
+  return `<button type="button" class="addv${short ? ' sm' : ''}" data-adddev="${esc(add.key)}" data-label="${esc(add.label)}">${short && add.rule ? `+ Add ${esc(add.rule)}` : `+ Add to my deviations: ${esc(add.label)}`}</button>`;
 }
+// After each decision, three rows: your play and its EV in dollars, the play to compare it with (your
+// chart's when you left it, otherwise the next best), and with deviations on, the index plays for the
+// hand. The grade is the icon. Review this hand has the full breakdown.
 function feedbackHTML(rec) {
   if (!fbShown()) return '';
   if (settings.feedback === 'mistakes' && tableMode !== 'review' && rec.grade === 'correct' && !rec.alt) return '';
-  const g = gradeName(rec), [ico, cls] = GRADES[g];
-  const tag = g === 'brilliant' ? '<em class="brill">Brilliant</em>' : g === 'marginal' ? '<em class="marg">Marginal</em>' : rec.isDev ? '<em>Index play</em>' : '';
-  const l1 = rec.action === rec.correct ? `${esc(playName(rec, rec.action))} · ${esc(rec.hand)}`
-    : `You ${esc(PAST[rec.action])}. ${g === 'brilliant' ? 'Your chart says' : g === 'marginal' ? 'Best' : 'Correct'}: ${esc(playName(rec, rec.correct))} · ${esc(rec.hand)}`;
-  const lines = [];
-  if (g === 'brilliant') lines.push(brillText(rec));
-  if (!rec.ok) lines.push(esc(costText(rec)));
-  if (rec.isDev && rec.idxGainU !== undefined && !(rec.brill && rec.brill.kind === 'rare')) lines.push(idxGainText(rec));
-  if (rec.second && !(rec.isDev && rec.second.action === rec.bsAct)) lines.push(secondText(rec));
-  if (rec.alt) lines.push(altText(rec));
-  if (rec.add) lines.push(addBtnHTML(rec.add));
-  return `<div class="fb ${cls}"><span class="ico" aria-hidden="true">${ico}</span><div class="l1">${l1}${tag}</div>${lines.map((x, i) => `<div class="${i ? 'l3' : 'l2'}">${x}</div>`).join('')}</div>`;
+  const g = gradeName(rec), [ico, cls, label] = GRADES[g];
+  const other = rec.action !== rec.correct ? rec.correct : rec.second && rec.second.action;
+  const ev = (a) => (rec.evs && rec.evs[a] !== undefined ? fmt$(rec.evs[a] * rec.bet, true, true) : '–');
+  const row = (a, you) => `<span class="p${you ? ' you' : ''}">${esc(playName(rec, a))}</span><b class="v${you ? ' you' : ''}">${ev(a)}</b>`;
+  const devs = rec.devs ? `<div class="dv">Deviations: ${esc(rec.devs)}${addBtnHTML(rec.add, true)}</div>` : '';
+  return `<div class="fb ${cls}"><span class="ico" role="img" aria-label="${label}">${ico}</span><div class="fbr">${row(rec.action, true)}${other ? row(other) : ''}${devs}</div></div>`;
 }
 // One decision in full: the cards, the count, and what every play was worth.
 const miniCard = (r, s) => `<span class="mini${s === 1 || s === 2 ? ' red' : ''}" role="img" aria-label="${RK[r]} of ${SUIT_NAMES[s]}">${RK[r]}<small>${SU[s]}</small></span>`;
@@ -3007,7 +3261,8 @@ function renderMsg() {
     h += `<button type="button" class="fbtn" data-review="1">${bad ? `Review this hand · ${bad} misplay${bad === 1 ? '' : 's'}` : 'Review this hand'}</button>`;
   }
   if (!h && (phase === 'bet' || phase === 'settled')) {
-    h = `<div class="hintline">${tableMode === 'review' ? 'Deal the next review hand.' : autoBetOn() ? 'Bets follow your bet table. Press Deal.' : 'Tap chips to set your bet, then Deal. Clear the bet to sit out a round.'}</div>`;
+    h = `<div class="hintline">${tableMode === 'review' ? 'Deal the next review hand.' : autoBetOn() ? 'Bets follow your bet table. Press Deal.'
+      : settings.multiHands ? 'Tap chips to set your bet per hand, pick how many hands, then Deal.' : 'Tap chips to set your bet, then Deal. Clear the bet to sit out a round.'}</div>`;
   }
   if (el.innerHTML !== h) el.innerHTML = h;
 }
@@ -3020,10 +3275,12 @@ function renderDock() {
   if (phase === 'settled') key = 'bet';
   if (phase === 'boot') key = 'deal';
   if (key === 'bet' && tableMode === 'review') key = 'review';
-  if (key !== dockKey) {
-    dockKey = key;
+  const multi = key === 'bet' && settings.multiHands;   // the bet dock gets a row for how many hands
+  if (key + (multi ? '+hands' : '') !== dockKey) {
+    dockKey = key + (multi ? '+hands' : '');
     if (key === 'bet') {
       d.innerHTML = `<div class="chips">${CHIPS.map((v, i) => `<button class="chip c${v}" data-chip="${v}" aria-label="Add $${v}" title="Add $${v} (${i + 1})"><span>${v >= 1000 ? '1K' : v}</span></button>`).join('')}</div>
+        ${multi ? `<div class="spots" role="group" aria-label="Hands to play"><span>Hands</span>${[1, 2, 3, 4].map((n) => `<button type="button" data-spots="${n}" aria-label="${n} hand${n === 1 ? '' : 's'}">${n}</button>`).join('')}</div>` : ''}
         <div class="betrow"><button class="btn" id="btnClear">Clear</button><button class="btn" id="btnRamp" title="Set the bet your ramp calls for">Ramp</button><button class="btn primary" id="btnDeal"><span id="dealLbl">Deal</span> <b id="dealAmt" style="font-family:var(--f-mono);letter-spacing:0;margin-left:4px"></b></button></div>`;
     } else if (key === 'review') {
       d.innerHTML = `<div class="dock-note" id="rvNote"></div><button class="btn primary" id="btnDeal" style="height:56px">Deal the hand</button>`;
@@ -3042,15 +3299,20 @@ function renderDock() {
     $('btnRamp').hidden = tableMode === 'test';   // no bet help during a test
     $('btnDeal').disabled = !!modal;
     $('dealLbl').textContent = bet > 0 ? 'Deal' : 'Watch round';
-    $('dealAmt').textContent = bet > 0 ? fmt$(bet) : '';
+    $('dealAmt').textContent = bet > 0 ? betTxt(bet, spotsNow()) : '';
+    d.querySelectorAll('[data-spots]').forEach((b) => {
+      const on = +b.dataset.spots === spotsNow();
+      b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); b.disabled = locked;
+    });
   } else if (key === 'review') {
     const sc = review && review.sc;
     const src = !sc ? '' : sc.src === 'misplay' ? 'One of your misplays' + (sc.item && sc.item.miss ? `, missed ${sc.item.miss + 1}×` : '') : sc.src === 'struggle' ? 'A hand you often get wrong' : 'A tough decision';
     $('rvNote').textContent = src + (sc && sc.varied ? (sc.varied === 'count' ? ' · the count is a little different this time' : ' · the total is a little different this time') : '') + (review ? ` · ${review.right}/${review.done} right` : '');
     $('btnDeal').disabled = !!modal;
   } else if (key === 'insurance' && round && round.insOffer) {
-    const o = round.insOffer;
-    $('insNote').textContent = o.natural ? 'You have blackjack and the dealer shows an ace.' : 'The dealer shows an ace.';
+    const o = round.insOffer, many = o.hands > 1;
+    $('insNote').textContent = (o.natural ? (many ? 'Every hand is a blackjack and the dealer shows an ace.' : 'You have blackjack and the dealer shows an ace.') : 'The dealer shows an ace.')
+      + (many ? ` It covers all ${o.hands} hands.` : '');
     $('insYTxt').textContent = o.natural ? 'Even money' : 'Insurance ' + fmt$(o.amount);
     $('insNTxt').textContent = o.natural ? 'No, play it' : 'No insurance';
     $('btnInsY').classList.toggle('hint', hintOn() && o.best);
@@ -3097,7 +3359,7 @@ function shoePanelHTML(withLog) {
   if (count && (countVisible || peeking)) {
     const t = tcExact(), k = tcIntOf(t);
     h += `<div class="edge-now"><span>Edge at this count</span><b class="${toneP(strat ? strat.edgeAt(t) : 0)}">${strat ? pct(strat.edgeAt(t), 2) : ''}</b></div>
-      <div class="edge-now" style="margin-top:0;border-top:0;padding-top:4px"><span>Your bet at TC ${sgn(k)}</span><b>${rampTxt(rampBet(k))}</b></div>`;
+      <div class="edge-now" style="margin-top:0;border-top:0;padding-top:4px"><span>Your bet at TC ${sgn(k)}</span><b>${rampTxt(rampBet(k), rampSpots(k))}</b></div>`;
   }
   if (strat && !strat.ready) h += `<div class="edge-now"><span>Working out index plays for these rules</span><b>${Math.round(stratProgress() * 100)}%</b></div><div class="progress"><i style="width:${(stratProgress() * 100).toFixed(0)}%"></i></div>`;
   h += '</section>';
@@ -3518,7 +3780,7 @@ function detailHTML(tab, key) {
     lines += `<p><b>${label}:</b> ${esc(inSet ? ruleText(t, series, bs, true, R) : ruleText(t, series, bs, false))}</p>`;
     const wide = flipsOf(series, KMAX).flips.filter((f) => Math.abs(f.at) > R);
     if (inSet && wide.length) lines += `<p class="note">Outside your \u00b1${R} range: ${wide.map((f) => (f.to ? 'yes' : 'no') + ' from TC ' + sgn(f.at)).join(', ')}.</p>`;
-    const rank = strat.ready && devModeNow() !== 'bs' ? strat.rankIndexPlays(R, settings.rampBets) : null;
+    const rank = strat.ready && devModeNow() !== 'bs' ? strat.rankIndexPlays(R, rampMoney()) : null;
     const info = rank && rank.byKey[t + ':' + key];
     if (info) lines += `<p class="note">Value: #${info.rank} of ${rank.list.length} index plays, about ${fmt$(info.value * 100)} per 100 rounds with your bets${!inSet ? ' (not in your set)' : ''}.</p>`;
   }
@@ -3534,7 +3796,7 @@ function detailHTML(tab, key) {
   }).join('');
   const tags = [];
   for (const t of types) if (I18_KEYS.has(i18Key(t, key))) tags.push(t === 'R' ? 'Fab 4' : 'Illustrious 18');
-  if (strat.ready && devModeNow() === 'adv') for (const t of types) { const qk = t + ':' + key; if (!I18_KEYS.has(i18Key(t, key)) && strat.rankIndexPlays(R, settings.rampBets).adv.has(qk)) tags.push('Advanced set'); }
+  if (strat.ready && devModeNow() === 'adv') for (const t of types) { const qk = t + ':' + key; if (!I18_KEYS.has(i18Key(t, key)) && strat.rankIndexPlays(R, rampMoney()).adv.has(qk)) tags.push('Advanced set'); }
   if (devModeNow() === 'adv' || devModeNow() === 'i18') for (const t of types) if (settings.customDevs.includes(t + ':' + key)) tags.push('Added by you');
   return `<div class="detail"><h4>${esc(title)}</h4>
     ${tags.length ? `<div>${[...new Set(tags)].map((x) => `<span class="tag">${x}</span>`).join(' ')}</div>` : ''}
@@ -3545,7 +3807,7 @@ function detailHTML(tab, key) {
 function listTabHTML() {
   if (devModeNow() === 'bs') return '<p class="note" style="margin:0">Deviations are off. Turn them on in Settings to get a study list.</p>';
   if (!strat.ready) return `<p class="note" style="margin:0">Ranking the index plays for these rules: ${Math.round(stratProgress() * 100)}%.</p>`;
-  const R = settings.devRange, rank = strat.rankIndexPlays(R, settings.rampBets), opts = decOpts();
+  const R = settings.devRange, rank = strat.rankIndexPlays(R, rampMoney()), opts = decOpts();
   const items = rank.list.filter((q) => inActiveSet(strat, q, opts));
   const intro = devModeNow() === 'adv' ? `Your advanced set: the Illustrious 18 and Fab 4 plus the ${ADV_EXTRA} most valuable other plays for these rules, ranked by what each one is worth with your bets.`
     : devModeNow() === 'i18' ? 'The Illustrious 18 and Fab 4 for these rules, ranked by what each one is worth with your bets.'
@@ -3565,16 +3827,26 @@ function listTabHTML() {
 }
 // ---------- risk of ruin for a bet table ----------
 const VAR_PER_BET = 1.3;   // variance of one round per unit bet, a standard value that covers doubles and splits
-function rampRisk(bets, bank) {
+// correlation between two of your hands in the same round, which face one dealer hand: a covariance of about
+// 0.48 per unit bet squared over a variance of 1.3, as the simulation of this game also finds
+const HAND_CORR = 0.37;
+// hands: the number of hands at each true count, or null for one everywhere. Bets in the result (average,
+// smallest, biggest) are what goes out in a round: the bet times the hands.
+function rampRisk(bets, hands, bank) {
   const w = strat.tcDist();
+  // a round of n hands uses about (n + 1) / 2 times the cards of one, so fewer rounds come at those counts
+  const handsAt = (j) => (hands && bets[j] > 0 ? hands[j] : 1), slot = (i) => Math.max(-3, Math.min(10, KMIN + i)) + 3;
+  let Z = 0;
+  for (let i = 0; i < w.length; i++) Z += w[i] * 2 / (handsAt(slot(i)) + 1);
   let ev = 0, m2 = 0, play = 0, sumBet = 0, minB = Infinity, maxB = 0;
   for (let i = 0; i < w.length; i++) {
-    const k = KMIN + i, b = bets[Math.max(-3, Math.min(10, k)) + 3];
+    const k = KMIN + i, j = slot(i), b = bets[j], n = handsAt(j);
     if (!(b > 0) || !(w[i] > 0)) continue;
-    const e = strat.edgeAt(repTC(k, settings.tcMode));
-    play += w[i]; sumBet += w[i] * b; ev += w[i] * b * e; m2 += w[i] * b * b * VAR_PER_BET;
-    if (b < minB) minB = b;
-    if (b > maxB) maxB = b;
+    const wi = w[i] * 2 / (n + 1) / Z, e = strat.edgeAt(repTC(k, settings.tcMode)), m = n * b;
+    play += wi; sumBet += wi * m; ev += wi * m * e;
+    m2 += wi * b * b * VAR_PER_BET * n * (1 + (n - 1) * HAND_CORR);   // n correlated hands
+    if (m < minB) minB = m;
+    if (m > maxB) maxB = m;
   }
   return riskFrom(ev, Math.max(1e-9, m2 - ev * ev), bank, { play, maxB, minB: isFinite(minB) ? minB : 0, avgBet: play ? sumBet / play : 0 });
 }
@@ -3590,7 +3862,7 @@ function riskFrom(ev, v, bank, extra) {
 
 // ---------- game analysis: simulate the game with your rules, bets and index set ----------
 let analysis = null;
-const analysisKey = () => JSON.stringify(stratRules()) + '|' + settings.rampBets.join(',') + '|' + devModeNow() + '|' + settings.devRange + '|' + settings.customDevs.join(',');
+const analysisKey = () => JSON.stringify(stratRules()) + '|' + settings.rampBets.join(',') + '|' + (rampHandsOn() || []).join(',') + '|' + devModeNow() + '|' + settings.devRange + '|' + settings.customDevs.join(',');
 function runSims(jobs, onProgress) {
   return new Promise((resolve, reject) => {
     if (fillWorker && strat && strat.workerOwned) {
@@ -3600,7 +3872,7 @@ function runSims(jobs, onProgress) {
       return;
     }
     // no worker: run a shorter simulation here
-    setTimeout(() => { try { resolve(jobs.map((j) => simulateGame(strat, { rounds: Math.min(j.rounds, 250000), ramp: j.ramp, opts: j.opts }))); } catch (err) { reject(err); } }, 30);
+    setTimeout(() => { try { resolve(jobs.map((j) => simulateGame(strat, { rounds: Math.min(j.rounds, 250000), ramp: j.ramp, hands: j.hands, opts: j.opts }))); } catch (err) { reject(err); } }, 30);
   });
 }
 function summarizeSim(r) {
@@ -3616,9 +3888,10 @@ async function startAnalysis(rounds) {
   const a = analysis = { key, status: 'running', progress: 0, rounds };
   refreshAnalysis(true);
   while (strat && !strat.ready) { await sleep(120); if (analysis !== a) return; }
-  const o = decOpts(), bets = settings.rampBets.slice();
-  const jobs = [{ rounds, ramp: bets, opts: { mode: 'bs', range: o.range, ramp: bets } }];
-  if (o.mode !== 'bs') jobs.push({ rounds, ramp: bets, opts: { mode: o.mode, range: o.range, ramp: bets, custom: o.custom } });
+  // bets and hands deal the rounds; the index plays are ranked by the money out at each count, as at the table
+  const o = decOpts(), bets = settings.rampBets.slice(), hands = rampHandsOn() && rampHandsOn().slice(), money = rampMoney().slice();
+  const jobs = [{ rounds, ramp: bets, hands, opts: { mode: 'bs', range: o.range, ramp: money } }];
+  if (o.mode !== 'bs') jobs.push({ rounds, ramp: bets, hands, opts: { mode: o.mode, range: o.range, ramp: money, custom: o.custom } });
   try {
     const res = await runSims(jobs, (p) => { if (analysis === a) { a.progress = p; refreshAnalysis(); } });
     if (analysis !== a) return;
@@ -3643,13 +3916,13 @@ function refreshAnalysis(force) {
 const analysisDone = () => analysis && analysis.status === 'done' && analysis.key === analysisKey();
 function activeIndexCount() {
   if (devModeNow() === 'bs' || !strat.ready) return 0;
-  const rk = strat.rankIndexPlays(settings.devRange, settings.rampBets), o = decOpts();
+  const rk = strat.rankIndexPlays(settings.devRange, rampMoney()), o = decOpts();
   return rk.list.filter((q) => inActiveSet(strat, q, o)).length;
 }
 function analysisOutHTML() {
   const modeName = { adv: 'Advanced set', full: 'every index', i18: 'Illustrious 18 + Fab 4', bs: 'basic strategy' }[devModeNow()];
   if (!analysisDone()) {
-    const est = rampRisk(settings.rampBets, settings.riskBank);
+    const est = rampRisk(settings.rampBets, rampHandsOn(), settings.riskBank);
     const p = analysis && analysis.key === analysisKey() ? analysis.progress : 0;
     const err = analysis && analysis.status === 'error';
     return `<div class="figs">
@@ -3674,13 +3947,13 @@ function analysisOutHTML() {
     <p class="note" style="margin:0">Simulated ${a.rounds.toLocaleString()} rounds per line: heads-up, ${esc(rulesText(settings))}, your bet table and ${modeName}. The \u00b1 figures are 95% ranges. ${a.rounds < 3000000 ? '<button class="btn small" id="anaMore" type="button">Simulate 3 million rounds</button>' : ''}</p>`;
 }
 function riskBlockHTML() {
-  const nz = settings.rampBets.filter((b) => b > 0);
+  const nz = rampMoney().filter((b) => b > 0);   // what goes out in a round, for the spread
   if (analysisDone()) {
     const m = analysis.mine;
     return riskStatsHTML(riskFrom(m.ev, m.v, settings.riskBank, { play: m.played / m.rounds, avgBet: m.avgBet, minB: nz.length ? Math.min(...nz) : 0, maxB: nz.length ? Math.max(...nz) : 0 }))
       + '<p class="note" style="margin:6px 0 0">From the simulated win rate and standard deviation.</p>';
   }
-  return riskStatsHTML(rampRisk(settings.rampBets, settings.riskBank)) + '<p class="note" style="margin:6px 0 0">Estimate from the edge table until the simulation finishes.</p>';
+  return riskStatsHTML(rampRisk(settings.rampBets, rampHandsOn(), settings.riskBank)) + '<p class="note" style="margin:6px 0 0">Estimate from the edge table until the simulation finishes.</p>';
 }
 function tcTableHTML() {
   const dist = strat.tcDist(), sim = analysisDone() ? analysis.mine : null;
@@ -3696,7 +3969,7 @@ function tcTableHTML() {
     const share = sim ? sd / sim.rounds : f;
     const e = strat.edgeAt(repTC(k, settings.tcMode)), b = rampBet(k);
     const se = sim && sb > 0 ? sNet / sb : null;
-    rows += `<tr><td>${RAMP_LABELS[i]}</td><td>${(share * 100).toFixed(1)}%</td><td class="${se === null ? '' : toneP(se)}">${se === null ? '\u2013' : pct(se, 1)}</td><td class="${toneP(e)}">${pct(e, 1)}</td><td>${b > 0 ? fmt$(b) : 'Sit out'}</td></tr>`;
+    rows += `<tr><td>${RAMP_LABELS[i]}</td><td>${(share * 100).toFixed(1)}%</td><td class="${se === null ? '' : toneP(se)}">${se === null ? '\u2013' : pct(se, 1)}</td><td class="${toneP(e)}">${pct(e, 1)}</td><td>${b > 0 ? betTxt(b, rampSpots(k)) : 'Sit out'}</td></tr>`;
   });
   return `<div class="tbl-wrap"><table class="edge"><thead><tr><th>TC</th><th>Rounds</th><th>Simulated edge</th><th>Model edge</th><th>Your bet</th></tr></thead><tbody>${rows}</tbody></table></div>
     <p class="note" style="margin:0">Rounds is the share of rounds dealt at that true count. Simulated edge is what your play earned there${devModeNow() === 'bs' ? '' : ' with your index plays'}; at sit-out counts there is nothing to measure. Model edge is the perfect-play edge used for EV in the shoe report.</p>`;
@@ -3745,9 +4018,9 @@ function edgeTabHTML() {
   RAMP_TCS.forEach((k, i) => {
     let f = 0;
     for (let j = 0; j < dist.length; j++) { const kk = KMIN + j; if ((i === 0 && kk <= k) || (i === RAMP_TCS.length - 1 && kk >= k) || kk === k) f += dist[j]; }
-    const e = strat.edgeAt(repTC(k, settings.tcMode)), b = rampBet(k);
+    const e = strat.edgeAt(repTC(k, settings.tcMode)), b = rampBet(k), n = rampSpots(k);
     const w = Math.min(100, Math.abs(e) * 2500);
-    rows += `<tr><td>${RAMP_LABELS[i]}</td><td>${(f * 100).toFixed(1)}%</td><td class="${toneP(e)}">${pct(e, 2)}</td><td style="text-align:left;width:22%"><span class="bar" style="width:${w.toFixed(0)}%;background:${e >= 0 ? 'var(--good)' : 'var(--bad)'}"></span></td><td>${b > 0 ? fmt$(b) : 'Sit out'}</td><td class="${tone(e * b)}">${b > 0 ? fmt$(e * b, true) : '\u2013'}</td></tr>`;
+    rows += `<tr><td>${RAMP_LABELS[i]}</td><td>${(f * 100).toFixed(1)}%</td><td class="${toneP(e)}">${pct(e, 2)}</td><td style="text-align:left;width:22%"><span class="bar" style="width:${w.toFixed(0)}%;background:${e >= 0 ? 'var(--good)' : 'var(--bad)'}"></span></td><td>${b > 0 ? betTxt(b, n) : 'Sit out'}</td><td class="${tone(e * b * n)}">${b > 0 ? fmt$(e * b * n, true) : '\u2013'}</td></tr>`;
   });
   return `<div class="detail"><h4>Insurance</h4><p>${insTxt}</p></div>
     <div class="grid-stats"><div><span>House edge off the top</span><b class="${toneP(strat.offTop)}">${pct(strat.offTop, 2)}</b></div><div><span>Edge per true count</span><b>${pct((strat.edgeInt(4) - strat.edgeInt(0)) / 4, 2)}</b></div><div><span>Penetration</span><b>${penPct(settings)}%</b></div></div>
@@ -3759,8 +4032,8 @@ function edgeTabHTML() {
         <label>Rounds per hour<input type="number" id="rkRph" min="10" max="400" step="5" value="${settings.rph}"></label>
         <label>Trip length (hours)<input type="number" id="rkTrip" min="1" max="2000" step="1" value="${settings.tripHours}"></label>
       </div>
-      <div id="rkOut">${riskStatsHTML(rampRisk(settings.rampBets, settings.riskBank))}</div>
-      <p class="note" style="margin:0">Uses this game\u2019s true count frequencies and edge table, with a variance of ${VAR_PER_BET} per unit bet (doubles and splits included). Change the bets in Settings \u2192 Betting.</p>
+      <div id="rkOut">${riskStatsHTML(rampRisk(settings.rampBets, rampHandsOn(), settings.riskBank))}</div>
+      <p class="note" style="margin:0">Uses this game\u2019s true count frequencies and edge table, with a variance of ${VAR_PER_BET} per unit bet (doubles and splits included)${settings.multiHands ? `, and a correlation of ${HAND_CORR} between your hands in the same round` : ''}. Change the bets in Settings \u2192 Betting.</p>
     </div>`;
 }
 
@@ -3797,7 +4070,9 @@ const SCHEMA = [
   ['Betting', [
     { key: 'betMode', label: 'Bet sizing', type: 'seg', opts: [['manual', 'I place bets'], ['auto', 'Follow my ramp']], sub: 'Auto bets reveal the count, so use manual bets when the count is hidden' },
     { key: 'unit', label: 'Betting unit', type: 'seg', opts: [[5, '$5'], [10, '$10'], [25, '$25'], [50, '$50'], [100, '$100']], sub: 'Changing the unit rescales your bet table' },
-    { key: 'rampBets', label: 'Bet at each true count', type: 'rampTable', sub: 'Dollars per hand. Enter $0 to sit out and watch the round.' },
+    { key: 'multiHands', label: 'Play more than one hand', type: 'toggle', sub: `Up to ${MAX_SPOTS} hands a round. Set how many at each true count in the bet table` },
+    { key: 'rampBets', label: 'Bet at each true count', type: 'rampTable',
+      sub: (d) => (d.multiHands ? 'Dollars per hand, and under each bet how many hands to play. Enter $0 to sit out and watch the round.' : 'Dollars per hand. Enter $0 to sit out and watch the round.') },
     { key: 'risk', label: 'Risk for these bets', type: 'riskLive' },
     { key: 'gradeBets', label: 'Check my bets against my bet table', type: 'toggle' },
     { key: 'startBankroll', label: 'Starting bankroll', type: 'seg', opts: [[2000, '$2K'], [5000, '$5K'], [10000, '$10K'], [25000, '$25K']], sub: 'Applies when you reset the session' },
@@ -3822,11 +4097,13 @@ function openSettings() {
         else if (it.type === 'range') {
           const max = Math.max(0.25, draft.decks - 0.5);
           ctl = `<div class="rangebox"><input type="range" id="cutRange" min="0.25" max="${max}" step="0.25" value="${Math.min(draft.cutDecks, max)}"><output id="cutOut"></output></div>`;
-        } else if (it.type === 'rampTable') ctl = `<div class="rampwrap"><div class="rampgrid">${RAMP_TCS.map((k, i) => `<label><span>${RAMP_LABELS[i]}</span><input type="number" inputmode="numeric" min="0" step="5" id="rb${i}" class="${draft.rampBets[i] > 0 ? '' : 'zero'}" value="${draft.rampBets[i]}" data-rb="${i}" aria-label="Bet at true count ${RAMP_LABELS[i]}"></label>`).join('')}</div>
+        } else if (it.type === 'rampTable') ctl = `<div class="rampwrap"><div class="rampgrid">${RAMP_TCS.map((k, i) => `<label><span>${RAMP_LABELS[i]}</span><input type="number" inputmode="numeric" min="0" step="5" id="rb${i}" class="${draft.rampBets[i] > 0 ? '' : 'zero'}" value="${draft.rampBets[i]}" data-rb="${i}" aria-label="Bet at true count ${RAMP_LABELS[i]}">${draft.multiHands
+            ? `<select data-rh="${i}" class="${draft.rampHands[i] > 1 ? '' : 'one'}" aria-label="Hands at true count ${RAMP_LABELS[i]}">${[1, 2, 3, 4].map((n) => `<option value="${n}"${draft.rampHands[i] === n ? ' selected' : ''}>×${n}</option>`).join('')}</select>` : ''}</label>`).join('')}</div>
             <div class="presets">${PRESETS.map(([id, l]) => `<button type="button" class="btn small" data-preset="${id}">${l}</button>`).join('')}</div></div>`;
         else if (it.type === 'riskLive') ctl = '<div class="risklive" id="riskLive"></div>';
         else if (it.type === 'customDevs') ctl = `<div class="cdevs">${val.length ? val.map((k) => `<span class="cdev">${esc(customDevLabel(k))}<button type="button" data-rmdev="${esc(k)}" aria-label="Remove ${esc(customDevLabel(k))}">×</button></span>`).join('') : '<span class="note">None yet. When a play off your chart beats it, the feedback offers to add it.</span>'}</div>`;
-        h += `<div class="srow"><div class="lab"><b>${it.label}</b>${it.sub ? `<small>${it.sub}</small>` : ''}</div>${ctl}</div>`;
+        const sub = typeof it.sub === 'function' ? it.sub(draft) : it.sub;
+        h += `<div class="srow"><div class="lab"><b>${it.label}</b>${sub ? `<small>${sub}</small>` : ''}</div>${ctl}</div>`;
       }
       h += '</section>';
     }
@@ -3846,7 +4123,12 @@ function openSettings() {
     body.querySelectorAll('[data-k]').forEach((b) => { b.onclick = () => {
       if (b.dataset.k === 'unit') { const nu = JSON.parse(b.dataset.v), ou = draft.unit; draft.rampBets = draft.rampBets.map((x) => (x > 0 ? Math.max(5, Math.round((x * nu) / ou / 5) * 5) : 0)); }
       draft[b.dataset.k] = JSON.parse(b.dataset.v); if (b.dataset.k === 'decks') draft.cutDecks = Math.min(Math.max(0.25, draft.cutDecks), Math.max(0.25, draft.decks - 0.5)); refresh(); warn(); }; });
-    body.querySelectorAll('[data-toggle]').forEach((b) => { b.onclick = () => { draft[b.dataset.toggle] = !draft[b.dataset.toggle]; b.setAttribute('aria-checked', String(draft[b.dataset.toggle])); warn(); }; });
+    body.querySelectorAll('[data-toggle]').forEach((b) => { b.onclick = () => {
+      draft[b.dataset.toggle] = !draft[b.dataset.toggle]; b.setAttribute('aria-checked', String(draft[b.dataset.toggle]));
+      if (b.dataset.toggle === 'multiHands') refresh();   // shows or hides the hands in the bet table
+      warn();
+    }; });
+    body.querySelectorAll('[data-rh]').forEach((s) => { s.onchange = () => { draft.rampHands[+s.dataset.rh] = +s.value; s.classList.toggle('one', +s.value === 1); updateRisk(); }; });
     body.querySelectorAll('[data-rb]').forEach((inp) => {
       inp.oninput = () => { draft.rampBets[+inp.dataset.rb] = Math.max(0, Math.round(+inp.value || 0)); inp.classList.toggle('zero', !(draft.rampBets[+inp.dataset.rb] > 0)); updateRisk(); };
       inp.onchange = () => { const v = Math.max(0, Math.round((+inp.value || 0) / 5) * 5); draft.rampBets[+inp.dataset.rb] = v; inp.value = v; updateRisk(); };
@@ -3855,7 +4137,7 @@ function openSettings() {
     body.querySelectorAll('[data-rmdev]').forEach((b) => { b.onclick = () => { draft.customDevs = draft.customDevs.filter((k) => k !== b.dataset.rmdev); refresh(); }; });
     updateRisk();
   };
-  const updateRisk = () => { const el = $('riskLive'); if (el && strat) el.innerHTML = riskStatsHTML(rampRisk(draft.rampBets, settings.riskBank), true) + `<p class="note" style="margin:6px 0 0">Estimate with your ${fmt$(settings.riskBank)} risk bankroll. For simulated results, apply and open Strategy chart \u2192 Game analysis.</p>`; };
+  const updateRisk = () => { const el = $('riskLive'); if (el && strat) el.innerHTML = riskStatsHTML(rampRisk(draft.rampBets, draft.multiHands ? draft.rampHands : null, settings.riskBank), true) + `<p class="note" style="margin:6px 0 0">Estimate with your ${fmt$(settings.riskBank)} risk bankroll. For simulated results, apply and open Strategy chart \u2192 Game analysis.</p>`; };
   const warn = () => {
     const shoeChange = SHOE_KEYS.some((k) => draft[k] !== settings[k]);
     const busy = !(phase === 'bet' || phase === 'settled');
@@ -3890,7 +4172,7 @@ function applySettings(draft) {
     if (phase === 'bet' || phase === 'settled') applyRulesNow();
     else { pendingRules = true; toast('New rules start with a new shoe after this round'); }
   } else if (stratChange) buildStrategy();
-  if (autoBetOn() && (phase === 'bet' || phase === 'settled')) bet = rampBet(tcNow());
+  if (autoBetOn() && (phase === 'bet' || phase === 'settled')) followRamp(tcNow());
   syncSeatsSafe();
   dockKey = '';
   render();
@@ -3952,7 +4234,7 @@ function renderHome() {
       <button class="hbtn" data-go="random"><b>Random</b><span>A random spot in a shoe every hand: any count, any depth. Your bankroll is untouched.</span></button>
       <button class="hbtn" data-go="test"><b>Test game</b><span>No count, no hints, no feedback. A set number of hands, graded at the end.</span></button>
       <button class="hbtn" data-go="review"${unlocked ? '' : ' aria-disabled="true"'}><b>Review mode</b><span>${esc(revSub)}</span>${unlocked ? (mem.items.length ? `<span class="badge gold">${mem.items.length}</span>` : '') : `<span class="badge">${Math.min(mem.hands, REVIEW_MIN_HANDS)}/${REVIEW_MIN_HANDS}</span>`}</button>
-      <button class="hbtn" data-go="analyze"><b>Analyze hand</b><span>Any hand at any true count: EV and win chances for every play</span></button>
+      <button class="hbtn" data-go="analyze"><b>Analyze hand</b><span>Simulate any hand at any count: EV and win chances for every play</span></button>
       <button class="hbtn" data-go="settings"><b>Settings</b><span>Rules, deviations, feedback, bets and the table</span></button>
       <button class="hbtn" data-go="help"><b>Help</b><span>Card counting, basic strategy, and how this app works</span></button>
     </div>
@@ -3976,6 +4258,7 @@ function openHelp() {
           <li><b>True count (TC):</b> the running count divided by the decks still to be dealt. +6 with 3 decks left is a true count of +2. Your bets and your deviations follow the true count.</li>
           <li><b>Rounding:</b> most counters floor the true count (+2.9 counts as +2, −0.4 as −1). Settings → Counting sets how the true count and the decks left are rounded.</li>
           <li><b>Betting:</b> each +1 of true count is worth roughly half a percent of edge. Bet small at neutral and negative counts and raise your bet as the true count climbs. Your bet table in Settings → Betting is your ramp.</li>
+          <li><b>More than one hand:</b> turn on <b>Play more than one hand</b> in Settings → Betting and set how many hands (up to ${MAX_SPOTS}) to play at each true count, for example two hands from +3 up. With manual bets, pick the number of hands above the Deal button. Each hand can split by the table’s split rule, and one insurance decision covers all your hands.</li>
         </ul></section>
       <section><h3>Basic strategy</h3>
         <p>Basic strategy is the best play for every hand against every dealer upcard, worked out for a full shoe and your table rules. Played perfectly, it brings the house edge down to around half a percent. The strategy chart (the grid button on the table) shows it for your rules. Decide in this order: surrender, then split, then double, then hit or stand.</p>
@@ -3991,11 +4274,12 @@ function openHelp() {
         </ul></section>
       <section><h3>How you are graded</h3>
         <div class="glist">
-          <span class="g correct">✓</span><span><b>Correct:</b> your chart’s play. The feedback shows the next best play and the true count where it would take over.</span>
+          <span class="g correct">✓</span><span><b>Correct:</b> your chart’s play.</span>
           <span class="g brilliant">!!</span><span><b>Brilliant:</b> a deviation that is only right at a true count of +6 or more (or −6 or less), or a play that beats your chart: a deviation found with deviations off, one outside your set, or one that is right only because of rounding, like insurance at a true count of +2.9 that floors to +2.</span>
           <span class="g marginal">–</span><span><b>Marginal:</b> not the best play, but it costs less than half a percent of your bet.</span>
-          <span class="g mistake">✕</span><span><b>Mistake:</b> anything costlier. The feedback shows what it cost you.</span>
+          <span class="g mistake">✕</span><span><b>Mistake:</b> anything costlier.</span>
         </div>
+        <p>After each decision the feedback shows your play and its EV in dollars, then your chart’s play (or the next best play, when you made your chart’s) and its EV. With deviations on, a third line lists the index plays for that hand.</p>
         <p>Feedback hides itself while the count is hidden (the eye button, or C), so you can count without hints. When a hand is over, <b>Review this hand</b> shows each decision with the EV of every play.</p></section>
       <section><h3>Modes</h3>
         <ul>
@@ -4003,7 +4287,7 @@ function openHelp() {
           <li><b>Random:</b> every hand starts at a random point in a freshly shuffled shoe, so you face a real count at any depth. Your bankroll is untouched.</li>
           <li><b>Test game:</b> choose how many hands. The count, true count and decks left are hidden, and there are no hints, feedback or bet help. Everything is graded at the end, including the running count you give.</li>
           <li><b>Review mode:</b> unlocks after ${REVIEW_MIN_HANDS} hands. It deals your misplays again at the same count (mistakes far more often than marginal plays), plus tough hands and the situations you get wrong most. Sometimes the count or your total is a little different. Each right answer makes a misplay less likely to come back, and after a few it retires.</li>
-          <li><b>Analyze hand:</b> pick any cards, upcard, true count, depth and rules to see the EV and the win, push and loss chances of every play.</li>
+          <li><b>Analyze hand:</b> pick any cards, upcard, running or true count, depth and rules. A simulation deals the hand a million times from shoes at that count and shows the EV of every play with its 95% range, how often it wins, pushes and loses, and which play is best.</li>
         </ul></section>
       <section><h3>Keyboard</h3>
         <div class="keys"><span><kbd>H</kbd> hit</span><span><kbd>S</kbd> stand</span><span><kbd>D</kbd> double</span><span><kbd>P</kbd> split</span><span><kbd>R</kbd> surrender</span><span><kbd>Y</kbd> / <kbd>N</kbd> insurance</span><span><kbd>Enter</kbd> deal</span><span><kbd>1</kbd>–<kbd>5</kbd> chips</span><span><kbd>C</kbd> show or hide the count</span></div></section>
@@ -4011,9 +4295,73 @@ function openHelp() {
 }
 
 // ---------- analyze a hand ----------
-// Any cards at any true count and depth: EV and win / push / lose chances of every play, from the same
-// engine as the trainer (exact dealer, first card exact), after the dealer has checked for blackjack.
-const az = { rules: null, up: 10, cards: [10, 6], tc: 0, dl: null };
+// Any cards at any count and depth: EV and win / push / lose chances of every play, after the dealer has
+// checked for blackjack, from a simulation that deals the hand from shoes at that running count and depth
+// (simulateHand). The same engine as the trainer gives an estimate from the average shoe until it is done.
+// rc is the running count with your cards and the upcard counted; tc is rc over the decks left.
+const az = { rules: null, up: 10, cards: [10, 6], tc: 0, rc: 0, dl: null };
+const AZ_TRIALS = 1000000;
+const HAND_GLUE = [
+  '', 'onmessage = function (e) {',
+  '  var snap = simulateHand(e.data, function (p, s) { postMessage({ type: "progress", p: p, snap: s }); });',
+  '  postMessage({ type: "done", snap: snap });',
+  '};', ''].join('\n');
+// The simulation for the hand on screen, in a worker of its own so it never waits behind the strategy.
+let azSim = null, azTimer = 0, handWorkerUrl = '', azPaint = 0;
+function stopHandSim() {
+  clearTimeout(azTimer);
+  if (azSim && azSim.worker) { try { azSim.worker.terminate(); } catch (e) { /* already gone */ } azSim.worker = null; }
+  if (azSim && azSim.status === 'running') azSim = null;
+}
+function runHandSim(cfg, key) {
+  stopHandSim();
+  const s = azSim = { key, status: 'running', progress: 0, snap: null, trials: cfg.trials, worker: null };
+  const repaint = (force) => { const now = performance.now(); if (force || now - azPaint > 180) { azPaint = now; renderAzOut(); } };
+  const src = $('coreSrc');
+  if (src && typeof Worker !== 'undefined' && typeof Blob !== 'undefined') {
+    try {
+      if (!handWorkerUrl) handWorkerUrl = URL.createObjectURL(new Blob([src.textContent, HAND_GLUE], { type: 'text/javascript' }));
+      const w = s.worker = new Worker(handWorkerUrl);
+      w.onmessage = (e) => {
+        if (azSim !== s) return;
+        s.snap = e.data.snap;
+        if (e.data.type === 'done') { s.status = 'done'; s.progress = 1; s.worker = null; w.terminate(); repaint(true); }
+        else { s.progress = e.data.p; repaint(false); }
+      };
+      w.onerror = () => { if (azSim === s) { s.status = 'error'; s.worker = null; repaint(true); } };
+      w.postMessage(cfg);
+      repaint(true);
+      return;
+    } catch (e) { /* no worker: a shorter run here */ }
+  }
+  setTimeout(() => {
+    if (azSim !== s) return;
+    try { s.snap = simulateHand(Object.assign({}, cfg, { trials: Math.min(cfg.trials, 200000) })); s.status = 'done'; } catch (e) { s.status = 'error'; }
+    repaint(true);
+  }, 30);
+}
+// Table rows from a simulation: EV with its 95% range, and the chances (per split hand for a split).
+function simRows(snap, R, hi, two) {
+  const rows = snap.order.map((a) => {
+    const s = snap.acts[a], ev = s.sum / s.n;
+    return { a, ev, ci: 1.96 * Math.sqrt(Math.max(0, s.sq / s.n - ev * ev) / s.n), o: s.hands ? [s.w / s.hands, s.p / s.hands, s.l / s.hands] : null, note: a === 'P' ? 'chances per split hand' : '' };
+  });
+  if (R.surrender && two && hi.total < 21) rows.push({ a: 'R', ev: -0.5, ci: 0, o: null });
+  return rows.sort((x, y) => y.ev - x.ev);
+}
+// 95% range of the gap between two plays: every play was dealt the same cards, so their results move together.
+function gapCI(snap, a, b) {
+  const n = snap.trials, K = snap.order.length;
+  const mean = (x) => (x === 'R' ? -0.5 : snap.acts[x].sum / n);
+  const vr = (x) => (x === 'R' ? 0 : Math.max(0, snap.acts[x].sq / n - mean(x) ** 2));
+  let cov = 0;
+  if (a !== 'R' && b !== 'R') {
+    let i = snap.order.indexOf(a), j = snap.order.indexOf(b);
+    if (i > j) [i, j] = [j, i];
+    cov = snap.cross[i * K + j] / n - mean(a) * mean(b);
+  }
+  return 1.96 * Math.sqrt(Math.max(0, vr(a) + vr(b) - 2 * cov) / n);
+}
 const AZ_RULES = [
   ['decks', 'Decks', [[1, '1'], [2, '2'], [4, '4'], [6, '6'], [8, '8']]],
   ['s17', 'Dealer', [[true, 'S17'], [false, 'H17']]],
@@ -4105,7 +4453,7 @@ function analyzeHand(comp, up, vals, R) {
 }
 function openAnalyze() {
   if (!az.rules) az.rules = Object.assign({}, stratRules());
-  openModal(`<div class="mhead"><h2>Analyze a hand<span class="sub">Any cards, any true count: what each play is worth and how often it wins</span></h2>${closeBtn}</div><div class="mbody"><div class="az" id="azBody"></div></div>`, { kind: 'analyze' });
+  openModal(`<div class="mhead"><h2>Analyze a hand<span class="sub">Any cards at any count, simulated: what each play is worth and how often it wins</span></h2>${closeBtn}</div><div class="mbody"><div class="az" id="azBody"></div></div>`, { kind: 'analyze', onClose: stopHandSim });
   renderAnalyze();
 }
 function renderAnalyze() {
@@ -4115,7 +4463,10 @@ function renderAnalyze() {
   const left = (v) => (v === 10 ? 16 : 4) * R.decks - az.cards.filter((x) => x === v).length - (az.up === v ? 1 : 0);
   // fewer decks can make the chosen cards impossible: drop the extras
   for (let i = az.cards.length - 1; i >= 0; i--) if (left(az.cards[i]) < 0) az.cards.splice(i, 1);
-  if (az.dl === null || az.dl > R.decks) az.dl = Math.max(0.5, Math.round(((R.decks + Math.min(settings.cutDecks, R.decks - 0.5)) / 2) * 4) / 4);
+  if (az.dl === null || az.dl > R.decks) {
+    az.dl = Math.max(0.5, Math.round(((R.decks + Math.min(settings.cutDecks, R.decks - 0.5)) / 2) * 4) / 4);
+    az.rc = Math.round(az.tc * az.dl);
+  }
   const full = az.cards.length >= 8 || handInfo(az.cards).hard >= 21;
   body.innerHTML = `
     <div class="az-sec"><b>Rules</b><div class="az-rules">${AZ_RULES.map(([k, l, opts]) => `<label>${l}<span class="seg" role="group" aria-label="${l}">${opts.map(([v, t]) => `<button type="button" data-azr="${k}" data-v='${JSON.stringify(v)}' class="${R[k] === v ? 'on' : ''}" aria-pressed="${R[k] === v}">${t}</button>`).join('')}</span></label>`).join('')}</div></div>
@@ -4123,58 +4474,96 @@ function renderAnalyze() {
     <div class="az-sec"><b>Your cards</b><div class="az-hand">${az.cards.length ? az.cards.map((v, i) => `<button type="button" class="mini" data-azrm="${i}" aria-label="Remove ${vName(v)}" title="Remove">${vName(v)}</button>`).join('') + '<button type="button" class="btn small" id="azClear">Clear</button>' : '<span class="note">Tap the cards below to build your hand</span>'}</div>
       <div class="az-pick">${UPS.map((v) => `<button type="button" data-azadd="${v}" aria-label="Add a card: ${vName(v)}"${full || left(v) <= 0 ? ' disabled' : ''}>${vName(v)}</button>`).join('')}</div></div>
     <div class="az-sec"><b>Count and depth</b>
-      <div class="az-num"><span class="note" style="min-width:84px">True count</span><button type="button" id="azTm" aria-label="True count minus one">−</button><input type="number" id="azTc" step="0.1" min="-12" max="12" value="${az.tc}" aria-label="True count"><button type="button" id="azTp" aria-label="True count plus one">+</button></div>
-      <div class="az-num"><span class="note" style="min-width:84px">Decks left</span><input type="range" id="azDl" min="0.5" max="${R.decks}" step="0.25" value="${az.dl}" aria-label="Decks left"><output id="azDlOut">${az.dl} of ${R.decks}</output></div></div>
+      <div class="az-num"><span class="note" style="min-width:104px">Running count</span><button type="button" id="azRm" aria-label="Running count minus one">−</button><input type="number" id="azRc" step="1" value="${az.rc}" aria-label="Running count"><button type="button" id="azRp" aria-label="Running count plus one">+</button></div>
+      <div class="az-num"><span class="note" style="min-width:104px">True count</span><button type="button" id="azTm" aria-label="True count minus one">−</button><input type="number" id="azTc" step="any" min="-12" max="12" value="${az.tc}" aria-label="True count"><button type="button" id="azTp" aria-label="True count plus one">+</button></div>
+      <div class="az-num"><span class="note" style="min-width:104px">Decks left</span><input type="range" id="azDl" min="0.5" max="${R.decks}" step="0.25" value="${az.dl}" aria-label="Decks left"><output id="azDlOut">${az.dl} of ${R.decks}</output></div>
+      <p class="note" style="margin:0">The running count includes your cards and the upcard. The true count is the running count over the decks left.</p></div>
     <div class="az-out" id="azOut"></div>`;
   body.querySelectorAll('[data-azr]').forEach((b) => { b.onclick = () => { R[b.dataset.azr] = JSON.parse(b.dataset.v); if (b.dataset.azr === 'decks') az.dl = null; renderAnalyze(); }; });
   body.querySelectorAll('[data-azup]').forEach((b) => { b.onclick = () => { az.up = +b.dataset.azup; renderAnalyze(); }; });
   body.querySelectorAll('[data-azadd]').forEach((b) => { b.onclick = () => { az.cards.push(+b.dataset.azadd); renderAnalyze(); }; });
   body.querySelectorAll('[data-azrm]').forEach((b) => { b.onclick = () => { az.cards.splice(+b.dataset.azrm, 1); renderAnalyze(); }; });
   const clr = $('azClear'); if (clr) clr.onclick = () => { az.cards = []; renderAnalyze(); };
-  const tcIn = $('azTc');
-  const setTC = (v) => { az.tc = Math.max(-12, Math.min(12, Math.round(v * 10) / 10)); tcIn.value = az.tc; renderAzOut(); };
+  // the running count and the true count move together: a new true count or depth sets the nearest running count
+  const tcIn = $('azTc'), rcIn = $('azRc'), rcMax = 20 * R.decks;
+  const fromTC = () => { az.rc = Math.max(-rcMax, Math.min(rcMax, Math.round(az.tc * az.dl))); rcIn.value = az.rc; renderAzOut(); };
+  const fromRC = () => { az.tc = Math.round((az.rc / az.dl) * 100) / 100; tcIn.value = az.tc; renderAzOut(); };
+  const setTC = (v) => { az.tc = Math.max(-12, Math.min(12, Math.round(v * 10) / 10)); tcIn.value = az.tc; fromTC(); };
+  const setRC = (v) => { az.rc = Math.max(-rcMax, Math.min(rcMax, Math.round(v))); rcIn.value = az.rc; fromRC(); };
   $('azTm').onclick = () => setTC(Math.ceil(az.tc) - 1);
   $('azTp').onclick = () => setTC(Math.floor(az.tc) + 1);
-  tcIn.oninput = () => { const v = parseFloat(tcIn.value); if (Number.isFinite(v)) { az.tc = Math.max(-12, Math.min(12, v)); renderAzOut(); } };
+  $('azRm').onclick = () => setRC(az.rc - 1);
+  $('azRp').onclick = () => setRC(az.rc + 1);
+  tcIn.oninput = () => { const v = parseFloat(tcIn.value); if (Number.isFinite(v)) { az.tc = Math.max(-12, Math.min(12, v)); fromTC(); } };
+  rcIn.oninput = () => { const v = parseFloat(rcIn.value); if (Number.isFinite(v)) { az.rc = Math.max(-rcMax, Math.min(rcMax, Math.round(v))); fromRC(); } };
   const dl = $('azDl');
-  dl.oninput = () => { az.dl = +dl.value; $('azDlOut').textContent = az.dl + ' of ' + R.decks; renderAzOut(); };
+  dl.oninput = () => { az.dl = +dl.value; $('azDlOut').textContent = az.dl + ' of ' + R.decks; fromTC(); };
   renderAzOut();
 }
 function renderAzOut() {
   const out = $('azOut');
   if (!out) return;
   const R = az.rules, vals = az.cards, up = az.up;
-  if (vals.length < 2) { out.innerHTML = '<p class="note" style="margin:0">Pick at least two cards for your hand.</p>'; return; }
+  if (vals.length < 2) { stopHandSim(); out.innerHTML = '<p class="note" style="margin:0">Pick at least two cards for your hand.</p>'; return; }
   const hi = handInfo(vals);
-  if (hi.hard > 21) { out.innerHTML = '<p class="note" style="margin:0">That hand is bust. Remove a card.</p>'; return; }
-  const comp = compAtTC(R.decks, az.dl, az.tc, vals.concat(up));
-  const N = csum(comp), pBJ = up === 1 ? comp[10] / N : up === 10 ? comp[1] / N : 0;
+  if (hi.hard > 21) { stopHandSim(); out.innerHTML = '<p class="note" style="margin:0">That hand is bust. Remove a card.</p>'; return; }
+  // simulate these cards at this count and depth, a moment after the last change
+  const key = JSON.stringify([R, up, vals, az.rc, az.dl]);
+  const cfg = (trials) => ({ rules: Object.assign({}, R), up, vals: vals.slice(), rc: az.rc, dl: az.dl, trials });
+  if (!azSim || azSim.key !== key) { stopHandSim(); azTimer = setTimeout(() => runHandSim(cfg(AZ_TRIALS), key), 300); }
+  const sim = azSim && azSim.key === key ? azSim : null;
+  const snap = sim && sim.snap && sim.snap.trials >= 20000 ? sim.snap : null;
+  const done = !!(snap && sim.status === 'done');
+  const tc = az.rc / az.dl;
+  const comp = compAtTC(R.decks, az.dl, tc, vals.concat(up));
+  const N = csum(comp), pBJ = snap ? snap.pBJ : up === 1 ? comp[10] / N : up === 10 ? comp[1] / N : 0;
   const two = vals.length === 2, pair = two && vals[0] === vals[1], natural = two && hi.total === 21;
   const pc = (x) => (x * 100).toFixed(1) + '%';
   const what = (natural ? 'Blackjack' : (pair ? 'Pair of ' + vName(vals[0]) + 's' : (hi.soft ? 'Soft ' : 'Hard ') + hi.total)) + ' vs ' + (up === 1 ? 'an ace' : up === 10 ? 'a 10' : 'a ' + up);
-  let html = `<p class="az-sum"><b>${esc(what)}</b> · true count ${sgnf(az.tc, 1)} · ${az.dl} decks left${pBJ ? ` · before checking, the dealer has blackjack ${pc(pBJ)} of the time` : ''}</p>`;
+  let html = `<p class="az-sum"><b>${esc(what)}</b> · running count ${sgn(az.rc)} · ${az.dl} decks left · true count ${sgnf(tc, 2)}${pBJ ? ` · before checking, the dealer has blackjack ${pc(pBJ)} of the time` : ''}</p>`;
+  // where the simulation is
+  const n = snap ? snap.trials : 0, total = sim ? sim.trials : AZ_TRIALS;
+  if (done) html += `<div class="az-simline"><span>Simulated <b>${n.toLocaleString()}</b> hands</span>${n < 5 * AZ_TRIALS ? '<button type="button" class="btn small" id="azMore">Simulate 5 million</button>' : ''}</div>`;
+  else if (sim && sim.status === 'error') html += '<p class="note" style="margin:0">The simulation stopped. These are the average-shoe figures; change anything to try again.</p>';
+  else html += `<div class="az-simline"><span>Simulating: ${n.toLocaleString()} of ${total.toLocaleString()} hands${snap ? '' : ' (the average-shoe estimate until then)'}</span></div><div class="progress" style="margin-top:0"><i style="width:${((sim ? sim.progress : 0) * 100).toFixed(0)}%"></i></div>`;
+  if (snap && snap.rc !== az.rc) html += `<p class="note" style="margin:0">A running count of ${sgn(az.rc)} can’t happen with these cards and ${az.dl} decks left, so the simulation uses ${sgn(snap.rc)}.</p>`;
   if (natural) {
     const evBJ = (1 - pBJ) * R.bjPays;
     html += `<p class="az-sum">Your blackjack pays ${R.bjPays === 1.2 ? '6:5' : '3:2'} and is worth <b>${pct(evBJ, 1)}</b> of your bet${up === 10 ? ' (it pushes when the dealer also has blackjack)' : ''}.${up === 1 ? ` Even money is worth exactly +100.0%, so <b>${evBJ > 1 ? 'decline it' : 'take it'}</b>.` : ''}</p>`;
     out.innerHTML = html;
     return;
   }
-  const { rows, dd } = analyzeHand(comp, up, vals, R);
+  let rows, dd;
+  if (snap) {
+    rows = simRows(snap, R, hi, two);
+    const dn = snap.dd.reduce((a, x) => a + x, 0) || 1;
+    dd = snap.dd.map((x) => x / dn);
+  } else ({ rows, dd } = analyzeHand(comp, up, vals, R));
   const top = rows[0].ev;
   // your chart's play, when these are your table's rules
   let chartA = null, bsA = null;
   if (strat && JSON.stringify(R) === JSON.stringify(stratRules())) {
-    const ctx = { vals, up, tcInt: tcIntOf(az.tc), canDouble: two && canDoubleTotal(hi.hard, hi.ace, R), canSplit: pair, canSurrender: R.surrender && two, isPair: pair, canHit: true };
+    const ctx = { vals, up, tcInt: tcIntOf(tc), canDouble: two && canDoubleTotal(hi.hard, hi.ace, R), canSplit: pair, canSurrender: R.surrender && two, isPair: pair, canHit: true };
     chartA = decide(strat, ctx, decOpts()).action;
     bsA = decide(strat, ctx, { mode: 'bs', range: 0 }).action;
   }
-  html += `<div class="tbl-wrap"><table class="tbl evt"><thead><tr><th>Play</th><th>EV</th><th>Win</th><th>Push</th><th>Lose</th><th aria-label="Chart"></th></tr></thead><tbody>${rows.map((r) => `<tr class="${r.ev === top ? 'best' : ''}"><td>${ACT[r.a]}${r.a === chartA ? '<span class="tg you">Your chart</span>' : ''}${r.a === bsA && bsA !== chartA ? '<span class="tg">Basic</span>' : ''}${r.note ? `<small class="note" style="display:block">${r.note}</small>` : ''}</td><td class="${r.ev >= 0 ? 'pos-c' : 'neg-c'}">${pct(r.ev, 1)}</td>${r.o
+  // the result: the best play, and whether the simulation separates it from the next one
+  if (done && rows.length > 1) {
+    const [b1, b2] = rows, gap = b1.ev - b2.ev, ci = gapCI(snap, b1.a, b2.a);
+    html += gap > ci
+      ? `<p class="az-sum az-verdict"><b>${ACT[b1.a]}</b> is the best play, worth <b>${(gap * 100).toFixed(2)}%</b> of your bet more than ${ACT[b2.a].toLowerCase()} (±${(ci * 100).toFixed(2)}%).</p>`
+      : `<p class="az-sum az-verdict"><b>${ACT[b1.a]}</b> and <b>${ACT[b2.a].toLowerCase()}</b> are too close to separate: ${(gap * 100).toFixed(2)}% apart, ±${(ci * 100).toFixed(2)}%.</p>`;
+  }
+  html += `<div class="tbl-wrap"><table class="tbl evt"><thead><tr><th>Play</th><th>EV</th><th>Win</th><th>Push</th><th>Lose</th><th aria-label="Chart"></th></tr></thead><tbody>${rows.map((r) => `<tr class="${r.ev === top ? 'best' : ''}"><td>${ACT[r.a]}${r.a === chartA ? '<span class="tg you">Your chart</span>' : ''}${r.a === bsA && bsA !== chartA ? '<span class="tg">Basic</span>' : ''}${r.note ? `<small class="note" style="display:block">${r.note}</small>` : ''}</td><td class="${r.ev >= 0 ? 'pos-c' : 'neg-c'}">${pct(r.ev, snap ? 2 : 1)}${r.ci ? `<small class="ci">±${(r.ci * 100).toFixed(2)}</small>` : ''}</td>${r.o
     ? `<td>${pc(r.o[0])}</td><td>${pc(r.o[1])}</td><td>${pc(r.o[2])}</td><td><span class="wbar" aria-hidden="true"><i class="w" style="width:${(r.o[0] * 100).toFixed(1)}%"></i><i class="p" style="width:${(r.o[1] * 100).toFixed(1)}%"></i><i class="l" style="width:${(r.o[2] * 100).toFixed(1)}%"></i></span></td>`
     : '<td colspan="4" class="note">Get half your bet back</td>'}</tr>`).join('')}</tbody></table></div>`;
   html += `<p class="note" style="margin:0">The dealer, after checking for blackjack: 17 ${pc(dd[0])} · 18 ${pc(dd[1])} · 19 ${pc(dd[2])} · 20 ${pc(dd[3])} · 21 ${pc(dd[4])} · bust ${pc(dd[5])}.</p>`;
   if (up === 1) { const evI = 1.5 * pBJ - 0.5; html += `<p class="az-sum">Insurance is worth <b>${pct(evI, 1)}</b> of your bet here, so ${evI > 0 ? '<b>take it</b>' : 'decline it'}.</p>`; }
-  html += `<p class="note" style="margin:0">EV is the average result as a share of your bet; a double or split counts the extra bet. Win, push and lose are after the dealer checks for blackjack. The cards still to come are the average shoe at this true count and depth (Hi-Lo), less your cards and the upcard.${chartA ? '' : ' Set the rules back to your table’s to see your chart’s play.'}</p>`;
+  html += `<p class="note" style="margin:0">${snap ? `Each hand is dealt from a random shoe with ${az.dl} decks left whose cards seen so far, yours and the upcard included, make a running count of ${sgn(snap.rc)}, and every play is dealt the same cards. After the first card, hits, stands and doubles follow the best play for the average shoe at this count, and a split resplits whenever the rules allow. ± is the 95% range.`
+    : 'Until the simulation is done, the cards still to come are the average shoe at this count and depth (Hi-Lo), less your cards and the upcard.'} EV is the average result as a share of your bet; a double or split counts the extra bet. Win, push and lose are after the dealer checks for blackjack.${chartA ? '' : ' Set the rules back to your table’s to see your chart’s play.'}</p>`;
   out.innerHTML = html;
+  const more = $('azMore');
+  if (more) more.onclick = () => runHandSim(cfg(5 * AZ_TRIALS), key);
 }
 
 // ---------- input wiring ----------
@@ -4207,7 +4596,8 @@ function wire() {
     if (!b || b.disabled) return;
     if (b.dataset.chip) addChip(+b.dataset.chip);
     else if (b.id === 'btnClear') clearBet();
-    else if (b.id === 'btnRamp') { bet = rampBet(tcNow()); renderTable(); renderDock(); }
+    else if (b.id === 'btnRamp') { followRamp(tcNow()); renderTable(); renderDock(); }
+    else if (b.dataset.spots) setSpots(+b.dataset.spots);
     else if (b.id === 'btnDeal') onDeal();
     else if (b.dataset.act) onAct(b.dataset.act);
     else if (b.id === 'btnInsY') onIns(true);
@@ -4249,7 +4639,7 @@ function wire() {
 }
 
 // read-only handle for inspecting a running table from the console
-window.cutcard = { get state() { return { phase, round, count, shoe, settings, session, shoeStats, strat, bet, modal: modal && modal.kind, screen, tableMode, mem, review, test, lastFeedback }; } };
+window.cutcard = { get state() { return { phase, round, count, shoe, settings, session, shoeStats, strat, bet, spots, modal: modal && modal.kind, screen, tableMode, mem, review, test, lastFeedback }; } };
 
 // ---------- boot ----------
 function boot() {
