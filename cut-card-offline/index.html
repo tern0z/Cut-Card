@@ -593,6 +593,8 @@ table.evt { min-width: 0; }
 .rv p b { color: var(--text); }
 
 .toast { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 60; background: var(--text); color: var(--bg); padding: 10px 16px; border-radius: 12px; font-weight: 700; font-size: 13.5px; box-shadow: 0 10px 30px rgba(0,0,0,.5); max-width: calc(100% - 32px); box-sizing: border-box; text-align: center; }
+.updbar { position: fixed; left: 50%; top: calc(10px + env(safe-area-inset-top, 0px)); transform: translateX(-50%); z-index: 65; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px 12px; width: max-content; max-width: calc(100% - 32px); box-sizing: border-box; padding: 10px 12px; border-radius: 14px; background: var(--panel); border: 1px solid var(--gold); box-shadow: 0 10px 30px rgba(0,0,0,.5); font-size: 13px; color: var(--text); text-align: center; }
+.updbar .ub { display: flex; gap: 8px; }
 .boot { position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; background: var(--bg); }
 .boot div { display: flex; flex-direction: column; align-items: center; gap: 12px; color: var(--muted); font-size: 13px; }
 .boot b { font: 700 26px/1 var(--f-display); letter-spacing: .1em; text-transform: uppercase; color: var(--text); }
@@ -657,6 +659,7 @@ table.evt { min-width: 0; }
 <div class="home" id="home" hidden></div>
 <div class="overlay" id="overlay" hidden><div class="modal" id="modal" role="dialog" aria-modal="true"></div></div>
 <div class="toast" id="toast" hidden></div>
+<div class="updbar" id="updBar" role="status" hidden><span>A new version of Cut Card is ready. Reloading starts your shoe over.</span><span class="ub"><button type="button" class="btn small" id="updLater">Later</button><button type="button" class="btn small primary" id="updGo">Reload</button></span></div>
 <div class="boot" id="boot"><div><b>Cut Card</b><span>Building the strategy for these rules…</span></div></div>
 
 <script id="coreSrc">
@@ -4702,8 +4705,26 @@ boot();
 <script>
 // Offline support: the service worker keeps a copy of the app on the device
 if ('serviceWorker' in navigator && window.isSecureContext && location.protocol !== 'file:') {
+  // A new version arrived while the app is open: offer to reload into it. The shoe isn't saved, so you choose when.
+  var hadWorker = !!navigator.serviceWorker.controller;
+  var offerUpdate = function () {
+    var bar = document.getElementById('updBar');
+    if (!bar || bar.dataset.shown) return;
+    bar.dataset.shown = '1'; bar.hidden = false;
+    document.getElementById('updGo').onclick = function () { location.reload(); };
+    document.getElementById('updLater').onclick = function () { bar.hidden = true; };
+  };
+  navigator.serviceWorker.addEventListener('message', function (e) { if (e.data && e.data.type === 'cutcard-updated') offerUpdate(); });
+  navigator.serviceWorker.addEventListener('controllerchange', function () { if (hadWorker) offerUpdate(); });
   addEventListener('load', function () {
-    navigator.serviceWorker.register('sw.js').catch(function () { /* still works online */ });
+    navigator.serviceWorker.register('sw.js').then(function (reg) {
+      // an app on the home screen comes back from the background without loading again, so look for a new version then
+      document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState !== 'visible') return;
+        reg.update().catch(function () {});
+        fetch('index.html', { cache: 'no-store' }).catch(function () {});
+      });
+    }).catch(function () { /* still works online */ });
     var installed = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
     if (installed && navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(function () {});
   });
