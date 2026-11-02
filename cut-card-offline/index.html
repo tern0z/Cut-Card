@@ -139,7 +139,18 @@ h2, h3 { text-wrap: balance; }
 .eye + .eye { margin-left: 0; }
 .eye { margin-left: auto; width: 46px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); display: grid; place-items: center; cursor: pointer; padding: 0; }
 .eye svg { width: 22px; height: 22px; stroke: var(--text-2); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-@media (max-width: 560px) { .meter { display: none; } .cpill { padding: 8px 10px; gap: 5px; } .cpill.dl .k { letter-spacing: .08em; } }
+.cpill.edge b { font-size: 17px; }
+/* phones: each pill stacks its label (and the exact true count) over the number, so all four fit beside the buttons */
+@media (max-width: 560px) {
+  .meter { display: none; }
+  .countbar { gap: 6px; }
+  .cpill { display: grid; grid-template-columns: auto auto; grid-template-areas: "k s" "b b"; justify-content: start; align-content: center; column-gap: 4px; row-gap: 3px; padding: 6px 9px; flex: 1 1 auto; }
+  .cpill .k { grid-area: k; font-size: 10px; letter-spacing: .08em; }
+  .cpill small { grid-area: s; font-size: 10px; }
+  .cpill b, .cpill.edge b { grid-area: b; font-size: 17px; }
+  .cpill .xl { display: none; }
+  .eye { width: 40px; flex: none; }
+}
 @media (max-width: 380px) { .cpill small { display: none; } }
 
 /* ---------- stage ---------- */
@@ -609,7 +620,8 @@ table.evt { min-width: 0; }
   <div class="countbar" id="countbar">
     <button class="cpill" id="pillRC" aria-label="Running count"><span class="k">RC</span><b id="rcVal">0</b></button>
     <button class="cpill" id="pillTC" aria-label="True count"><span class="k">TC</span><b id="tcVal">0</b><small id="tcExact"></small></button>
-    <div class="cpill static dl"><span class="k">Decks left</span><b id="decksVal">6.0</b></div>
+    <div class="cpill static dl"><span class="k">Decks<span class="xl"> left</span></span><b id="decksVal">6.0</b></div>
+    <div class="cpill static edge" title="Your edge at this true count"><span class="k">Edge</span><b id="edgeVal">0.0%</b></div>
     <div class="meter" id="meter" title="Shoe dealt so far; yellow mark = cut card"><i id="meterFill"></i><em id="meterCut"></em></div>
     <button class="eye" id="btnNewShoe" aria-label="Reset the shoe" title="Reset the shoe: shuffle a new shoe and start the count over"><svg viewBox="0 0 24 24"><path d="M3 7h3.2c2.5 0 3.9 1.3 5.4 4.1l1 1.9c1.5 2.8 2.9 4 5.4 4H21"/><path d="M18 13.8l3 3.2-3 3.2"/><path d="M3 17h3.2c1.1 0 2-.3 2.8-.8"/><path d="M14.9 7.8c.8-.5 1.7-.8 2.9-.8H21"/><path d="M18 3.8L21 7l-3 3.2"/></svg></button>
     <button class="eye" id="btnEye" aria-label="Hide the count" title="Hide or show the count (C)"><svg viewBox="0 0 24 24" id="eyeIcon"></svg></button>
@@ -1950,6 +1962,17 @@ function tcIntOf(t) {
   return Math.floor(t + 1e-9);
 }
 const tcNow = () => tcIntOf(tcExact());
+// Your edge at true count tc with dl decks left: the edge table inside the chart's counts (±12), and past
+// them the round at that count and depth itself (the table stops changing there), kept per whole count and
+// quarter deck.
+function edgeFor(tc, dl) {
+  if (!strat) return 0;
+  if (!pastChart(tc)) return strat.edgeAt(tc);
+  const cache = strat.edgePast || (strat.edgePast = new Map());
+  const k = Math.round(tc), d = Math.max(0.25, Math.round(dl * 4) / 4), key = k + '|' + d;
+  if (!cache.has(key)) cache.set(key, roundEV(compAtTC(settings.decks, d, k, []), stratRules()));
+  return cache.get(key);
+}
 const rampBet = (k) => settings.rampBets[Math.max(-3, Math.min(10, k)) + 3];
 // Hands to play at true count k: your bet table's number when more than one hand is on, otherwise one.
 const rampSpots = (k) => (settings.multiHands ? settings.rampHands[Math.max(-3, Math.min(10, k)) + 3] : 1);
@@ -2152,7 +2175,7 @@ async function revealHole() {
 async function playRound() {
   const pre = { rc: count.rc, tc: tcExact(), decks: decksLeft() };
   pre.tcI = tcIntOf(pre.tc);
-  pre.edge = strat.edgeAt(pre.tc);
+  pre.edge = edgeFor(pre.tc, pre.decks);
   const sitting = !(bet > 0), n = sitting ? 0 : spotsNow();
   // bet is per hand; stake is what goes out before the deal, on all your hands
   const r = round = { no: shoeStats.dealt + 1, dealer: { cards: [], holeHidden: true, holeId: -1 }, hands: [], active: -1, insurance: null, bet: sitting ? 0 : bet,
@@ -2456,10 +2479,21 @@ function secondBest(ctx, chosen, acts, evs) {
   }
   return { action: a2, evU: evs[a2], diffU: evs[a2] - evs[chosen], at, up: at !== null && at > k0 };
 }
+// The chart's EV tables stop at a true count of ±12; further out, the plays are valued at the count itself
+// and the decks left, with the same engine on the average shoe at that count.
+const pastChart = (x) => x >= KMAX + 1 || x < KMIN;
+function evsPastChart(ctx, x, dl) {
+  const R = stratRules(), comp = compAtTC(R.decks, dl, x, ctx.vals.concat(ctx.up));
+  if (ctx.vals.length === 2) return Object.assign({ R: -0.5 }, handEVs(comp, ctx.up, ctx.vals[0], ctx.vals[1], R));
+  const t = tablesFor(comp, ctx.up, R), hi = handInfo(ctx.vals), bt = bestTotal(hi.hard, hi.ace);
+  return bt < 21 ? { S: t.se[bt], H: t.H[hi.hard * 2 + hi.ace] } : { S: t.se[bt] };
+}
 function grade(h, ctx, best, action) {
   const chart = best.action;
   const bsAct = decide(strat, ctx, { mode: 'bs', range: 0 }).action;
-  const evs = actionEVsAt(strat, ctx, ctx.tcX), evB = actionEVs(strat, ctx);   // at the exact count, and at the rounded one
+  const past = pastChart(ctx.tcX);
+  // at the exact count, and at the rounded one
+  const evs = past ? evsPastChart(ctx, ctx.tcX, decksLeft()) : actionEVsAt(strat, ctx, ctx.tcX), evB = past ? evs : actionEVs(strat, ctx);
   const acts = (ctx.acts || [action, chart]).filter((a) => evs[a] !== undefined);
   const evOf = (a) => evs[a] ?? 0;
   const isDev = chart !== bsAct;
@@ -2476,7 +2510,7 @@ function grade(h, ctx, best, action) {
   const rec = { kind: 'play', round: round.no, hand: handLabel(ctx.vals, ctx.up), cs: h.cards.map((c) => [c.r, c.s]), ucs: [u.r, u.s], vals: ctx.vals.slice(), up: ctx.up,
     sk: sitKey(ctx), tcI: ctx.tcInt, tcX: ctx.tcX, dl: decksLeft(), action, correct: chart, bsAct, grade: g, ok, isDev, brill, bet: h.bet,
     rule: explain(best, action), lossU, loss: lossU * h.bet, idxGainU, idxGain: idxGainU * h.bet, alt,
-    why: brill && brill.kind === 'chart' ? offChartWhy(questionFor(ctx, action, chart)) : '',
+    why: brill && brill.kind === 'chart' ? (past ? `Your chart only goes to a true count of ±${KMAX}` : offChartWhy(questionFor(ctx, action, chart))) : '',
     add: brill && brill.kind !== 'rare' ? addOffer(ctx, action, chart) : alt ? addOffer(ctx, top, chart) : null,
     second: ok ? secondBest(ctx, action, acts, evs) : null, devs: devsText(handQuestions(strat, ctx)),
     evs: Object.fromEntries(acts.map((a) => [a, evs[a]])), evBest: evOf(chart) * h.bet, evMine: evOf(action) * h.bet };
@@ -2956,6 +2990,9 @@ function renderCount() {
   $('tcExact').textContent = show ? sgnf(t, 1) : '';
   const dv = decksForTC();
   $('decksVal').textContent = show ? (settings.deckEst === 'exact' ? dv.toFixed(1) : String(+dv.toFixed(2))) : '••';
+  const edge = edgeFor(t, decksLeft()), eb = $('edgeVal');
+  eb.textContent = show ? pct(edge, 1) : '••';
+  eb.className = show ? toneP(edge) : '';
   $('eyeIcon').innerHTML = countVisible ? EYE_OPEN : EYE_SHUT;
   $('btnEye').setAttribute('aria-label', countVisible ? 'Hide the count' : 'Show the count');
   const dealtFrac = Math.min(1, (shoe.total - shoe.undealt) / shoe.total);
@@ -3224,7 +3261,7 @@ function decisionDetailHTML(rec) {
   const table = rows.length ? `<div class="tbl-wrap"><table class="tbl evt"><thead><tr><th>Play</th><th>EV</th><th>vs best</th>${rec.bet ? `<th>On ${fmt$(rec.bet)}</th>` : ''}</tr></thead><tbody>${rows.map(([a, v]) =>
     `<tr class="${v === top ? 'best' : ''}"><td>${esc(playName(rec, a))}${a === rec.action ? '<span class="tg you">You</span>' : ''}${a === rec.correct ? '<span class="tg">Chart</span>' : ''}</td><td class="${v >= 0 ? 'pos-c' : 'neg-c'}">${pct(v, 1)}</td><td>${v === top ? 'Best' : pct(v - top, 1)}</td>${rec.bet ? `<td>${fmt$(v * rec.bet, true)}</td>` : ''}</tr>`).join('')}</tbody></table></div>` : '';
   return `<div class="rv">
-    <div class="rv-h"><span class="g ${g}" aria-label="${GRADES[g][2]}">${GRADES[g][0]}</span><b>${esc(rec.hand)}</b><span>TC ${sgn(rec.tcI)}${rec.tcX !== undefined ? ` (exact ${sgnf(rec.tcX, 2)})` : ''}${rec.dl ? ` · ${rec.dl.toFixed(1)} decks left` : ''}</span></div>
+    <div class="rv-h"><span class="g ${g}" aria-label="${GRADES[g][2]}">${GRADES[g][0]}</span><b>${esc(rec.hand)}</b><span>TC ${sgn(rec.tcI)}${rec.tcX !== undefined ? ` (exact ${sgnf(rec.tcX, 2)})` : ''}${rec.dl ? ` · ${rec.dl.toFixed(1)} decks left` : ''}${rec.dl && strat ? ` · edge ${pct(edgeFor(rec.tcX ?? rec.tcI, rec.dl), 1)}` : ''}</span></div>
     ${cards ? `<div class="rv-cards">${cards}<span class="vs">vs</span>${rec.ucs ? miniCard(rec.ucs[0], rec.ucs[1]) : ''}</div>` : ''}
     <p>You ${esc(PAST[rec.action])}. ${rec.action === rec.correct ? 'That is your chart’s play.' : `Your chart: <b>${esc(playName(rec, rec.correct))}</b>.`}${rec.rule ? ' ' + esc(rec.rule) + '.' : ''}</p>
     ${table}
@@ -3358,7 +3395,8 @@ function shoePanelHTML(withLog) {
   </div>`;
   if (count && (countVisible || peeking)) {
     const t = tcExact(), k = tcIntOf(t);
-    h += `<div class="edge-now"><span>Edge at this count</span><b class="${toneP(strat ? strat.edgeAt(t) : 0)}">${strat ? pct(strat.edgeAt(t), 2) : ''}</b></div>
+    const e = edgeFor(t, decksLeft());
+    h += `<div class="edge-now"><span>Edge at this count</span><b class="${toneP(e)}">${strat ? pct(e, 2) : ''}</b></div>
       <div class="edge-now" style="margin-top:0;border-top:0;padding-top:4px"><span>Your bet at TC ${sgn(k)}</span><b>${rampTxt(rampBet(k), rampSpots(k))}</b></div>`;
   }
   if (strat && !strat.ready) h += `<div class="edge-now"><span>Working out index plays for these rules</span><b>${Math.round(stratProgress() * 100)}%</b></div><div class="progress"><i style="width:${(stratProgress() * 100).toFixed(0)}%"></i></div>`;
