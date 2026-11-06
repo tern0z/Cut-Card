@@ -282,6 +282,7 @@ h2, h3 { text-wrap: balance; }
 @media (prefers-reduced-motion: reduce) { .phand.bj { animation: none; } }
 .banner { font: 700 12px/1 var(--f-display); letter-spacing: .16em; text-transform: uppercase; padding: 7px 12px; border-radius: 999px; background: rgba(0,0,0,.38); color: var(--gold); text-align: center; }
 .banner.cut { background: var(--warn); color: #2b1d00; }
+.banner.side { font: 600 12.5px/1.35 var(--f-body); letter-spacing: .01em; text-transform: none; color: var(--text); border: 1px solid rgba(230,195,111,.45); }
 .hintline { font-size: 12.5px; color: var(--text-2); letter-spacing: .02em; text-align: center; padding: 6px 12px; border-radius: 999px; background: rgba(4, 18, 12, .55); }
 
 /* ---------- dock ---------- */
@@ -314,6 +315,13 @@ h2, h3 { text-wrap: balance; }
 .spots button:hover { background: var(--panel-3); }
 .spots button.on { background: var(--gold); border-color: var(--gold); color: var(--gold-ink); }
 .spots button:disabled { opacity: .45; cursor: default; }
+/* side bets you can put out for the next round */
+.sides { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; }
+.sbt { display: inline-flex; align-items: baseline; gap: 7px; height: 34px; padding: 0 12px; border-radius: 10px; border: 1px dashed rgba(230,195,111,.55); background: transparent; color: var(--text-2); font: 700 12px/34px var(--f-display); letter-spacing: .1em; text-transform: uppercase; cursor: pointer; }
+.sbt b { font: 700 13px/1 var(--f-mono); letter-spacing: 0; }
+.sbt.on { background: var(--gold); border: 1px solid var(--gold); color: var(--gold-ink); }
+.sbt:disabled { opacity: .5; cursor: default; }
+.betside { font: 600 11.5px/1.2 var(--f-body); color: var(--gold); letter-spacing: .02em; }
 .btn { height: 50px; border-radius: 14px; border: 1px solid var(--line-2); background: var(--panel-2); cursor: pointer; font: 700 15px/1 var(--f-display); letter-spacing: .12em; text-transform: uppercase; padding: 0 14px; }
 .btn:hover { background: var(--panel-3); }
 .btn.primary { background: var(--gold); color: var(--gold-ink); border-color: transparent; box-shadow: inset 0 -3px 0 rgba(0,0,0,.2); }
@@ -595,6 +603,23 @@ table.evt { min-width: 0; }
 .toast { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 60; background: var(--text); color: var(--bg); padding: 10px 16px; border-radius: 12px; font-weight: 700; font-size: 13.5px; box-shadow: 0 10px 30px rgba(0,0,0,.5); max-width: calc(100% - 32px); box-sizing: border-box; text-align: center; }
 .updbar { position: fixed; left: 50%; top: calc(10px + env(safe-area-inset-top, 0px)); transform: translateX(-50%); z-index: 65; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px 12px; width: max-content; max-width: calc(100% - 32px); box-sizing: border-box; padding: 10px 12px; border-radius: 14px; background: var(--panel); border: 1px solid var(--gold); box-shadow: 0 10px 30px rgba(0,0,0,.5); font-size: 13px; color: var(--text); text-align: center; }
 .updbar .ub { display: flex; gap: 8px; }
+/* speed drill */
+.drill { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.drcards { --cw: clamp(76px, 24vw, 116px); display: flex; justify-content: center; align-items: center; gap: 10px; min-height: calc(var(--cw) * 1.4); width: 100%; box-sizing: border-box; padding: 16px; border-radius: 16px;
+  background: radial-gradient(120% 140% at 30% 0%, var(--felt-hi), var(--felt) 45%, var(--felt-lo)); cursor: pointer; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+.drmeta { display: flex; gap: 20px; font: 700 15px/1 var(--f-mono); color: var(--text-2); }
+.drbtns { display: flex; gap: 10px; }
+.drres { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; background: var(--panel-2); }
+.drres .ico { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font: 800 15px/1 var(--f-body); }
+.drres.ok .ico { background: var(--good); color: var(--good-ink); }
+.drres.bad .ico { background: var(--bad); color: var(--bad-ink); }
+.drres div { display: flex; flex-direction: column; gap: 3px; }
+.drres b { font-size: 16px; }
+.drres span { font-size: 13px; color: var(--text-2); }
+.drtrail { display: flex; flex-wrap: wrap; gap: 8px 10px; padding-top: 10px; }
+.drstep { display: inline-flex; align-items: center; gap: 3px; }
+.drstep b { margin-left: 3px; font: 700 12px/1 var(--f-mono); color: var(--gold); }
+.drrecent { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--text-2); }
 .boot { position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; background: var(--bg); }
 .boot div { display: flex; flex-direction: column; align-items: center; gap: 12px; color: var(--muted); font-size: 13px; }
 .boot b { font: 700 26px/1 var(--f-display); letter-spacing: .1em; text-transform: uppercase; color: var(--text); }
@@ -1692,6 +1717,8 @@ const DEFAULTS = {
   betMode: 'manual', unit: 25, rampBets: [25, 25, 25, 25, 50, 100, 150, 200, 200, 200, 200, 200, 200, 200], gradeBets: true, startBankroll: 10000,
   // more than one hand a round: how many (1 to MAX_SPOTS) at each true count of the bet table
   multiHands: false, rampHands: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  // side bets on your first two cards: on the table or not, the Lucky Ladies pay table, and the bet on each hand
+  sideLL: false, sideKB: false, llTable: 'a', sideAmt: 5,
   riskBank: 10000, rph: 100, tripHours: 4,
   bots: 0, speed: 'normal', countCheck: true, randomChecks: false,
 };
@@ -1704,7 +1731,9 @@ function sanitize(src) {
   const o = Object.assign({}, DEFAULTS, src || {});
   const pick = (v, list, d) => (list.includes(v) ? v : d);
   o.decks = pick(+o.decks, [1, 2, 4, 6, 8], DEFAULTS.decks);
-  for (const k of ['s17', 'das', 'surrender', 'rsa', 'hsa', 'burn', 'hint', 'pauseOnMistake', 'gradeBets', 'countCheck', 'randomChecks', 'useDevs', 'showBank', 'multiHands']) o[k] = !!o[k];
+  for (const k of ['s17', 'das', 'surrender', 'rsa', 'hsa', 'burn', 'hint', 'pauseOnMistake', 'gradeBets', 'countCheck', 'randomChecks', 'useDevs', 'showBank', 'multiHands', 'sideLL', 'sideKB']) o[k] = !!o[k];
+  o.llTable = pick(o.llTable, ['a', 'b'], 'a');
+  o.sideAmt = pick(+o.sideAmt, [1, 5, 10, 25, 50, 100], 5);
   o.maxHands = pick(+o.maxHands, [2, 3, 4, 99], DEFAULTS.maxHands);
   o.bjPays = +o.bjPays === 1.2 ? 1.2 : 1.5;
   o.doubleOn = pick(o.doubleOn, ['any', '9-11', '10-11'], 'any');
@@ -1784,7 +1813,10 @@ function T() {
 }
 
 // ---------- session ----------
-function blankTot() { return { rounds: 0, hands: 0, wagered: 0, initial: 0, net: 0, ev: 0, dec: 0, ok: 0, dev: 0, devOk: 0, lost: 0, bets: 0, betsOk: 0, checks: 0, checksOk: 0 }; }
+function blankTot() { return { rounds: 0, hands: 0, wagered: 0, initial: 0, net: 0, ev: 0, dec: 0, ok: 0, dev: 0, devOk: 0, lost: 0, bets: 0, betsOk: 0, checks: 0, checksOk: 0,
+  sideWag: 0, sideNet: 0, sideEV: 0, sides: 0, sidesOk: 0 }; }
+// adds to a total that sessions saved before it existed may not have
+const bump = (o, k, v) => { o[k] = (o[k] || 0) + v; };
 function freshSession() { return { v: 2, started: Date.now(), startBank: settings.startBankroll, bankroll: settings.startBankroll, shoes: [], series: [[0, 0, 0]], tot: blankTot() }; }
 function loadSession() { const s = store.get('session', null); return s && s.v === 2 && s.tot && Array.isArray(s.series) && s.series.length ? s : freshSession(); }
 function saveSession() {
@@ -1976,6 +2008,67 @@ function edgeFor(tc, dl) {
   if (!cache.has(key)) cache.set(key, roundEV(compAtTC(settings.decks, d, k, []), stratRules()));
   return cache.get(key);
 }
+
+// ---------- side bets: Lucky Ladies and King's Bounty ----------
+// Both pay when your first two cards total 20 (two ten-value cards, or an ace and a 9), more for suited and
+// matched cards, and the most for one pair when the dealer also has blackjack. They are settled on each of
+// your starting hands once the dealer has checked for blackjack.
+const SIDE_IDS = ['ll', 'kb'];
+const SIDE_NAME = { ll: 'Lucky Ladies', kb: 'King’s Bounty' };
+const LL_TABLES = { a: { jack: 1000, top: 200, matched: 25, suited: 10, any: 4 }, b: { jack: 1000, top: 125, matched: 19, suited: 9, any: 4 } };
+const KB_TABLE = { jack: 1000, top: 100, suitedK: 30, suitedQJT: 20, suited: 9, kings: 6, any: 4 };
+const sideOnTable = (id) => (id === 'll' ? settings.sideLL : settings.sideKB);
+// What a side bet pays for your first two cards (cards have rank r 1-13 and suit s, 0 spades, 1 hearts): pays is -1 when it loses.
+function sideHand(id, a, b, dealerBJ, llTable = settings.llTable) {
+  const va = Math.min(10, a.r), vb = Math.min(10, b.r);
+  if (!(va + vb === 20 || (va + vb === 10 && (va === 1 || vb === 1)))) return { pays: -1, hand: '' };
+  const same = a.r === b.r && a.s === b.s, suited = a.s === b.s;
+  if (id === 'll') {
+    const t = LL_TABLES[llTable];
+    if (same && a.r === 12 && a.s === 1) return dealerBJ ? { pays: t.jack, hand: 'Q♥ pair + dealer blackjack' } : { pays: t.top, hand: 'Q♥ pair' };
+    if (same) return { pays: t.matched, hand: 'matched 20' };
+    return suited ? { pays: t.suited, hand: 'suited 20' } : { pays: t.any, hand: '20' };
+  }
+  const t = KB_TABLE;
+  if (same && a.r === 13 && a.s === 0) return dealerBJ ? { pays: t.jack, hand: 'K♠ pair + dealer blackjack' } : { pays: t.top, hand: 'K♠ pair' };
+  if (same) return a.r === 13 ? { pays: t.suitedK, hand: 'suited kings' } : { pays: t.suitedQJT, hand: 'suited pair' };
+  if (suited) return { pays: t.suited, hand: 'suited 20' };
+  return a.r === 13 && b.r === 13 ? { pays: t.kings, hand: 'two kings' } : { pays: t.any, hand: '20' };
+}
+// EV per unit of a side bet before the deal, for unseen cards c. The ten-value cards left are spread at random
+// over their 16 kinds (rank and suit), so a given pair of them comes from the expected product of the copies left
+// (two identical cards are as likely deep in the shoe as early on).
+function sideEV(id, c, llTable = settings.llTable) {
+  const N = csum(c), NN = N * (N - 1), K = settings.decks, T = 16 * K, tens = c[10] * (c[10] - 1) / (T * (T - 1));
+  const pSame = K * (K - 1) * tens / NN;                            // one given identical pair, e.g. two queens of hearts
+  const pTwo = K * K * tens / NN;                                   // one given ordered pair of two different kinds
+  const a9 = 2 * c[1] * c[9] / NN, tt = c[10] * (c[10] - 1) / NN;   // an ace and a 9; two ten-value cards
+  const suitedTen = 48 * pTwo, offTen = tt - 16 * pSame - suitedTen;
+  const dBJ = 2 * c[1] * (c[10] - 2) / ((N - 2) * (N - 3));          // dealer blackjack once two ten-value cards are out
+  let win;
+  if (id === 'll') {
+    const t = LL_TABLES[llTable];
+    win = pSame * (dBJ * t.jack + (1 - dBJ) * t.top) + 15 * pSame * t.matched + (suitedTen + a9 / 4) * t.suited + (offTen + a9 * 3 / 4) * t.any;
+  } else {
+    const t = KB_TABLE, kk = 12 * pTwo;                             // kk: two kings of different suits
+    win = pSame * (dBJ * t.jack + (1 - dBJ) * t.top) + 3 * pSame * t.suitedK + 12 * pSame * t.suitedQJT + (suitedTen + a9 / 4) * t.suited
+      + kk * t.kings + (offTen - kk + a9 * 3 / 4) * t.any;
+  }
+  return win - (1 - tt - a9);
+}
+const sideEVAt = (id, tc, dl, llTable) => sideEV(id, compAtTC(settings.decks, dl, tc, []), llTable);
+// The whole true count from which a side bet pays: the first count where it is worth more than nothing at that
+// count's typical value (+4.5 for a floored +4), as in the side bets table in Game analysis.
+function sideIndex(id, llTable = settings.llTable) {
+  if (!strat) return null;
+  const cache = strat.sideIdx || (strat.sideIdx = {}), key = id + llTable + settings.tcMode;
+  if (cache[key] === undefined) {
+    let k = -10;
+    while (k < 40 && !(sideEVAt(id, repTC(k, settings.tcMode), strat.D, llTable) > 0)) k++;
+    cache[key] = k;
+  }
+  return cache[key];
+}
 const rampBet = (k) => settings.rampBets[Math.max(-3, Math.min(10, k)) + 3];
 // Hands to play at true count k: your bet table's number when more than one hand is on, otherwise one.
 const rampSpots = (k) => (settings.multiHands ? settings.rampHands[Math.max(-3, Math.min(10, k)) + 3] : 1);
@@ -1986,7 +2079,8 @@ const rampTxt = (b, n) => (b > 0 ? betTxt(b, n) + ' \u00b7 ' + unitsTxt(b) + (n 
 
 function newShoeStats() {
   return { no: session.shoes.length + 1, rules: rulesText(settings, true), rulesFull: rulesText(settings), rounds: 0, hands: 0, wagered: 0, initial: 0, net: 0, ev: 0,
-    decisions: [], bets: [], checks: [], maxTC: null, minTC: null, startBank: session.bankroll, dealt: 0, sat: 0 };
+    decisions: [], bets: [], checks: [], maxTC: null, minTC: null, startBank: session.bankroll, dealt: 0, sat: 0,
+    sideWag: 0, sideNet: 0, sideEV: 0, sides: [] };
 }
 function newShoe() {
   shoe = new Shoe(settings.decks, settings.cutDecks, settings.burn);
@@ -2122,6 +2216,7 @@ function resolveWait(kind, v) { const f = waiters[kind]; if (f) { delete waiters
 let phase = 'boot';
 let bet = Math.max(1, Number(store.get('bet', 0)) || settings.unit);
 let spots = Math.min(MAX_SPOTS, Math.max(1, Math.round(Number(store.get('spots', 1)) || 1)));   // hands you bet on, when more than one is on
+const sideOn = Object.assign({ ll: false, kb: false }, store.get('sideOn', {}));   // the side bets you put out, with manual bets
 let countVisible = store.get('countVisible', true) !== false;
 let peeking = false;
 let pendingRules = false;
@@ -2140,6 +2235,9 @@ let review = null;        // review mode: the scenario being dealt and the score
 const autoBetOn = () => settings.betMode === 'auto' && (tableMode === 'play' || tableMode === 'random');
 // The hands you bet on this round. Review hands are dealt to one.
 const spotsNow = () => (settings.multiHands && tableMode !== 'review' ? spots : 1);
+// A side bet goes out with this round: your choice, or with auto bets, from its index on.
+const sideWanted = (id) => (autoBetOn() ? sideIndex(id) !== null && tcNow() >= sideIndex(id) : !!sideOn[id]);
+const sidesNow = () => (tableMode === 'review' ? [] : SIDE_IDS.filter((id) => sideOnTable(id) && sideWanted(id)));
 function followRamp(k) { bet = rampBet(k); spots = rampSpots(k); }
 const hintOn = () => settings.hint && tableMode !== 'test';
 // Playing feedback shows only while the count is showing (review always shows it; a test never does).
@@ -2199,6 +2297,21 @@ async function playRound() {
     if (tableMode === 'test') test.bets.push(chk);
     else if (!ok && settings.feedback !== 'off') banner = betCheckText(r.rampBet, r.rampSpots, r.bet, n, pre.tcI);
   }
+  // side bets, one of each on every hand, checked against their index (auto bets follow it)
+  r.side = { ids: sitting ? [] : sidesNow(), amt: settings.sideAmt, wag: 0, net: 0, ev: 0, res: [], tips: [] };
+  if (!sitting && tableMode !== 'review') {
+    for (const id of SIDE_IDS) {
+      if (!sideOnTable(id)) continue;
+      const placed = r.side.ids.includes(id), ev = sideEVAt(id, pre.tc, pre.decks), idx = sideIndex(id);
+      if (placed) { r.side.wag += r.side.amt * n; r.side.ev += ev * r.side.amt * n; }
+      if (autoBetOn() || idx === null) continue;
+      const chk = { id, tcI: pre.tcI, ev, idx, placed, ok: placed === (pre.tcI >= idx) };
+      shoeStats.sides.push(chk);
+      if (tableMode === 'play') { bump(session.tot, 'sides', 1); if (chk.ok) bump(session.tot, 'sidesOk', 1); }
+      if (tableMode === 'test') test.sides.push(chk);
+      r.side.tips.push(chk);
+    }
+  }
   syncSeats();
   const you = seats.find((s) => s.kind === 'you');
   r.hands = you.hands = sitting ? [] : Array.from({ length: n }, (_, i) => newHand(bet, { spot: i }));
@@ -2212,6 +2325,7 @@ async function playRound() {
   const up = r.dealer.cards[0].v, hole = r.dealer.cards[1];
   const dealerBJ = (up === 1 && hole.v === 10) || (up === 10 && hole.v === 1);
   if (up === 1 && !sitting) await insurancePhase();
+  if (r.side.ids.length) settleSides(r, dealerBJ);
   for (const s of seats) for (const h of s.hands) if (isNatural(h)) { h.bj = true; h.done = true; }
   if (dealerBJ) {
     await revealHole();
@@ -2233,6 +2347,29 @@ async function playRound() {
   settle(false);
 }
 
+// Side bets are settled from each starting hand's first two cards once the dealer has checked for blackjack.
+function settleSides(r, dealerBJ) {
+  for (const id of r.side.ids) {
+    let won = 0, top = { pays: -1, hand: '' };
+    for (const h of r.hands) {
+      const x = sideHand(id, h.cards[0], h.cards[1], dealerBJ);
+      won += x.pays > 0 ? x.pays * r.side.amt : -r.side.amt;
+      if (x.pays > top.pays) top = x;
+    }
+    r.side.net += won;
+    r.side.res.push({ id, won, hand: top.hand });
+  }
+  render();
+}
+// Two short lines: "Lucky Ladies +$50 (suited 20) · King's Bounty −$5", then, when you went against the
+// count, "TC 0 · Lucky Ladies −17.6%, skip below +4".
+function sideLines(side) {
+  const lines = [];
+  if (side.res.length) lines.push(side.res.map((x) => `${SIDE_NAME[x.id]} ${fmt$(x.won, true)}${x.hand ? ` (${x.hand})` : ''}`).join(' · '));
+  const wrong = fbShown() && tableMode !== 'test' ? side.tips.filter((t) => !t.ok) : [];
+  if (wrong.length) lines.push(`TC ${sgn(wrong[0].tcI)} · ` + wrong.map((t) => `${SIDE_NAME[t.id]} ${pct(t.ev, 1)}, ${t.placed ? 'skip below' : 'bet from'} ${sgn(t.idx)}`).join(' · '));
+  return lines;
+}
 function betCheckText(ramp, rampN, b, n, k) {
   const at = countVisible ? ` at TC ${sgn(k)}` : '';
   if (ramp <= 0) return `Bet check: your ramp sits out${at}, you bet ${betTxt(b, n)}`;
@@ -2397,18 +2534,22 @@ function settle(dealerBJ) {
   r.net = net; r.wagered = wag; r.done = true;
   // only your shoe game moves the bankroll and the session stats
   const money = tableMode === 'play';
-  if (money) session.bankroll += net;
+  // side bets go into the bankroll but are totalled apart from the game itself
+  const side = r.side || { wag: 0, net: 0, ev: 0 };
+  if (money) session.bankroll += net + side.net;
   const ss = shoeStats, tt = session.tot;
   ss.dealt++;
   if (r.sitOut) ss.sat++;
   else {
     ss.rounds++; ss.hands += r.hands.length; ss.wagered += wag; ss.initial += r.stake; ss.net += net; ss.ev += r.ev;
+    ss.sideWag += side.wag; ss.sideNet += side.net; ss.sideEV += side.ev;
     if (money) {
       tt.rounds++; tt.hands += r.hands.length; tt.wagered += wag; tt.initial += r.stake; tt.net += net; tt.ev += r.ev;
+      bump(tt, 'sideWag', side.wag); bump(tt, 'sideNet', side.net); bump(tt, 'sideEV', side.ev);
       const last = session.series[session.series.length - 1];
       session.series.push([tt.rounds, Math.round((last[1] + net) * 100) / 100, Math.round((last[2] + r.ev) * 100) / 100]);
     }
-    if (tableMode === 'test') { test.net += net; test.ev += r.ev; test.wagered += wag; test.initial += r.stake; }
+    if (tableMode === 'test') { test.net += net; test.ev += r.ev; test.wagered += wag; test.initial += r.stake; test.sideWag += side.wag; test.sideNet += side.net; test.sideEV += side.ev; }
     if (tableMode !== 'review') { mem.hands++; saveMem(); }
   }
   if (money) saveSession();
@@ -2861,7 +3002,8 @@ function startTest(n) {
   if (!atRest()) { toast('Finish this hand first.'); return; }
   leaveMode();
   tableMode = 'test';
-  test = { n, rounds: 0, decisions: [], bets: [], net: 0, ev: 0, wagered: 0, initial: 0, check: null, prevCount: countVisible, started: Date.now() };
+  test = { n, rounds: 0, decisions: [], bets: [], net: 0, ev: 0, wagered: 0, initial: 0, check: null, prevCount: countVisible, started: Date.now(),
+    sides: [], sideWag: 0, sideNet: 0, sideEV: 0 };
   countVisible = false;
   newShoe();
   syncSeats();
@@ -2908,6 +3050,7 @@ function summarizeShoe(check) {
   const sum = { no: ss.no, rules: ss.rules, rulesFull: ss.rulesFull, at: Date.now(), rounds: ss.rounds, hands: ss.hands, wagered: ss.wagered, initial: ss.initial, net: ss.net, ev: ss.ev,
     dec: plays.length, ok, brill: n('brilliant'), marg: n('marginal'), bad: n('mistake'), dev: devs.length, devOk: devs.filter((d) => d.ok).length, lost: plays.reduce((a, d) => a + (d.loss || 0), 0),
     bets: ss.bets.length, betsOk: ss.bets.filter((b) => b.ok).length, check, maxTC: ss.maxTC, minTC: ss.minTC, unit: settings.unit, sat: ss.sat,
+    sideWag: ss.sideWag, sideNet: ss.sideNet, sideEV: ss.sideEV, sides: ss.sides.length, sidesOk: ss.sides.filter((x) => x.ok).length,
     // a short version is kept with the session; the report you see now gets the full records
     mistakes: notable.slice(0, 40).map((d) => ({ round: d.round, hand: d.hand, tcI: d.tcI, action: d.action, correct: d.correct, loss: d.loss, grade: d.grade, kind: d.kind, even: d.even,
       bet: d.bet, brill: d.brill })),
@@ -2948,6 +3091,12 @@ function addChip(v) {
   renderTable(); renderDock();
 }
 function clearBet() { if (!(phase === 'bet' || phase === 'settled') || betLocked()) return; bet = 0; renderTable(); renderDock(); }
+function toggleSide(id) {
+  if (!(phase === 'bet' || phase === 'settled') || betLocked() || !sideOnTable(id)) return;
+  sideOn[id] = !sideOn[id];
+  store.set('sideOn', sideOn);
+  renderTable(); renderDock();
+}
 function setSpots(n) {
   if (!(phase === 'bet' || phase === 'settled') || betLocked() || !settings.multiHands) return;
   spots = Math.min(MAX_SPOTS, Math.max(1, n));
@@ -3188,7 +3337,9 @@ function chipStackHTML(amount) {
 function betSpotHTML() {
   if (!(bet > 0)) return '<div class="betspot"><div class="betring sit"><span>Sit out</span></div><span class="betamt">Watch the next round</span></div>';
   const ring = `<div class="betring"><div class="chipstack">${chipStackHTML(bet)}</div></div>`;
-  return `<div class="betspot"><div class="rings">${ring.repeat(spotsNow())}</div><span class="betamt">${betTxt(bet, spotsNow())}</span></div>`;
+  const sides = sidesNow();
+  return `<div class="betspot"><div class="rings">${ring.repeat(spotsNow())}</div><span class="betamt">${betTxt(bet, spotsNow())}</span>${sides.length
+    ? `<span class="betside">+ ${sides.map((id) => SIDE_NAME[id]).join(' and ')} ${fmt$(settings.sideAmt)}${spotsNow() > 1 ? ' a hand' : ''}</span>` : ''}</div>`;
 }
 
 const cents = (x, signed) => (Math.abs(x) >= 0.005 ? fmt$(x, signed) : 'under 1¢');
@@ -3294,6 +3445,8 @@ function renderMsg() {
   if (cutNotice && phase !== 'shoe-end' && tableMode === 'play') h += '<div class="banner cut">Cut card is out · last round of the shoe</div>';
   if (phase === 'shoe-end') h += '<div class="banner cut">Shoe complete</div>';
   if (banner) h += `<div class="banner">${esc(banner)}</div>`;
+  const sl = round && round.side ? sideLines(round.side) : [];
+  if (sl.length) h += `<div class="banner side">${sl.map(esc).join('<br>')}</div>`;
   if (lastFeedback) h += feedbackHTML(lastFeedback);
   // once a hand is over you can go back over its decisions (not during a test, and not while the count is hidden)
   if (phase === 'settled' && round && round.done && round.decs && round.decs.length && fbShown()) {
@@ -3316,11 +3469,14 @@ function renderDock() {
   if (phase === 'boot') key = 'deal';
   if (key === 'bet' && tableMode === 'review') key = 'review';
   const multi = key === 'bet' && settings.multiHands;   // the bet dock gets a row for how many hands
-  if (key + (multi ? '+hands' : '') !== dockKey) {
-    dockKey = key + (multi ? '+hands' : '');
+  const sideIds = key === 'bet' ? SIDE_IDS.filter(sideOnTable) : [];   // and one for the side bets on the table
+  const dk = key + (multi ? '+hands' : '') + (sideIds.length ? '+' + sideIds.join('') + settings.sideAmt : '');
+  if (dk !== dockKey) {
+    dockKey = dk;
     if (key === 'bet') {
       d.innerHTML = `<div class="chips">${CHIPS.map((v, i) => `<button class="chip c${v}" data-chip="${v}" aria-label="Add $${v}" title="Add $${v} (${i + 1})"><span>${v >= 1000 ? '1K' : v}</span></button>`).join('')}</div>
         ${multi ? `<div class="spots" role="group" aria-label="Hands to play"><span>Hands</span>${[1, 2, 3, 4].map((n) => `<button type="button" data-spots="${n}" aria-label="${n} hand${n === 1 ? '' : 's'}">${n}</button>`).join('')}</div>` : ''}
+        ${sideIds.length ? `<div class="sides" role="group" aria-label="Side bets">${sideIds.map((id) => `<button type="button" class="sbt" data-side="${id}" title="${SIDE_NAME[id]} (${id === 'll' ? 'L' : 'K'})"><span>${SIDE_NAME[id]}</span><b>${fmt$(settings.sideAmt)}</b></button>`).join('')}</div>` : ''}
         <div class="betrow"><button class="btn" id="btnClear">Clear</button><button class="btn" id="btnRamp" title="Set the bet your ramp calls for">Ramp</button><button class="btn primary" id="btnDeal"><span id="dealLbl">Deal</span> <b id="dealAmt" style="font-family:var(--f-mono);letter-spacing:0;margin-left:4px"></b></button></div>`;
     } else if (key === 'review') {
       d.innerHTML = `<div class="dock-note" id="rvNote"></div><button class="btn primary" id="btnDeal" style="height:56px">Deal the hand</button>`;
@@ -3342,6 +3498,10 @@ function renderDock() {
     $('dealAmt').textContent = bet > 0 ? betTxt(bet, spotsNow()) : '';
     d.querySelectorAll('[data-spots]').forEach((b) => {
       const on = +b.dataset.spots === spotsNow();
+      b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); b.disabled = locked;
+    });
+    d.querySelectorAll('[data-side]').forEach((b) => {
+      const on = sideWanted(b.dataset.side);
       b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); b.disabled = locked;
     });
   } else if (key === 'review') {
@@ -3490,6 +3650,13 @@ function mistakePause(rec) {
   });
 }
 
+// Side bets in a report: their result and EV, and how often you bet them by the count. Nothing when unused.
+function sideStatsHTML(wag, net, ev, n, ok) {
+  let h = '';
+  if (wag) h += `<div><span>Side bets</span><b class="${tone(net || 0)}">${fmt$(net || 0, true)}</b><small>EV ${fmt$(ev || 0, true)} on ${fmt$(wag)} bet</small></div>`;
+  if (n) h += `<div><span>Side bets by the count</span><b>${ok || 0}/${n}</b></div>`;
+  return h;
+}
 function figure(label, value, toneCls, sub) { return `<div class="fig"><span>${label}</span><b class="${toneCls || ''}">${value}</b>${sub ? `<small>${sub}</small>` : ''}</div>`; }
 // "3 brilliant · 2 marginal · 1 mistake"
 function gradeCounts(brill, marg, bad) {
@@ -3527,6 +3694,7 @@ function openSummary(sum) {
           <div><span>Index plays right</span><b>${sum.dev ? sum.devOk + '/' + sum.dev : 'None came up'}</b></div>
           <div><span>EV lost to mistakes</span><b class="${sum.lost > 0.005 ? 'neg' : ''}">${sum.lost > 0.005 ? fmt$(-sum.lost, true) : '$0'}</b></div>
           <div><span>Bets on the ramp</span><b>${sum.bets ? sum.betsOk + '/' + sum.bets : 'Not checked'}</b></div>
+          ${sideStatsHTML(sum.sideWag, sum.sideNet, sum.sideEV, sum.sides, sum.sidesOk)}
           <div><span>Count check</span>${chk}</div>
         </div>
         <div><h3 class="sec-h">Misplays and brilliant plays</h3>${mist}</div>
@@ -3570,6 +3738,7 @@ function openTestReport(t) {
           <div><span>Result</span><b class="${tone(t.net)}">${fmt$(t.net, true)}</b></div>
           <div><span>EV of your bets</span><b class="${tone(t.ev)}">${fmt$(t.ev, true)}</b></div>
           <div><span>Total bet</span><b>${fmt$(t.wagered)}</b></div>
+          ${sideStatsHTML(t.sideWag, t.sideNet, t.sideEV, t.sides.length, t.sides.filter((x) => x.ok).length)}
         </div>
         <div><h3 class="sec-h">Misplays and brilliant plays</h3>${list.length ? '<ul class="mlist">' + list.map(misplayItemHTML).join('') + '</ul>' : '<p class="empty" style="margin:0">A clean test: every play matched your chart.</p>'}</div>
         <p class="note" style="margin:0">Mistakes and marginal plays are saved for Review mode. The result and EV are for this test only and do not touch your bankroll.</p>
@@ -3598,6 +3767,7 @@ function openStats() {
         <div><span>EV lost to mistakes</span><b class="${tt.lost > 0.005 ? 'neg' : ''}">${tt.lost > 0.005 ? fmt$(-tt.lost, true) : '$0'}</b></div>
         <div><span>Count checks right</span><b>${tt.checks ? tt.checksOk + '/' + tt.checks : '–'}</b></div>
         <div><span>Bets on the ramp</span><b>${tt.bets ? tt.betsOk + '/' + tt.bets : '–'}</b></div>
+        ${sideStatsHTML(tt.sideWag, tt.sideNet, tt.sideEV, tt.sides, tt.sidesOk)}
       </div>
       <div><h3 class="sec-h">Result vs EV by round</h3><div id="chartHost"></div></div>
       ${shoeStats && shoeStats.rounds ? `<div>${shoePanelHTML(false).replace('<section class="panel">', '<section class="panel" style="background:var(--panel-2)">')}</div>` : ''}
@@ -4015,6 +4185,25 @@ function tcTableHTML() {
   return `<div class="tbl-wrap"><table class="edge"><thead><tr><th>TC</th><th>Rounds</th><th>Simulated edge</th><th>Model edge</th><th>Your bet</th></tr></thead><tbody>${rows}</tbody></table></div>
     <p class="note" style="margin:0">Rounds is the share of rounds dealt at that true count. Simulated edge is what your play earned there${devModeNow() === 'bs' ? '' : ' with your index plays'}; at sit-out counts there is nothing to measure. Model edge is the perfect-play edge used for EV in the shoe report.</p>`;
 }
+// Lucky Ladies and King's Bounty at each true count, and what betting them from their index adds per 100
+// rounds at your side bet size (shares of rounds from this game's count frequencies).
+function sideTableHTML() {
+  const dist = strat.tcDist(), idx = { ll: sideIndex('ll'), kb: sideIndex('kb') };
+  const ev = (id, k) => sideEVAt(id, repTC(k, settings.tcMode), strat.D);
+  let rows = '';
+  for (let k = -2; k <= KMAX; k++) {
+    rows += `<tr><td>${sgn(k)}${k === KMAX ? '+' : ''}</td><td>${(dist[k - KMIN] * 100).toFixed(1)}%</td>${SIDE_IDS.map((id) => {
+      const e = ev(id, k);
+      return `<td class="${toneP(e)}"${k === idx[id] ? ' style="box-shadow:inset 0 2px 0 var(--gold)"' : ''}>${pct(e, 1)}</td>`;
+    }).join('')}</tr>`;
+  }
+  const add = (id) => { let g = 0; for (let k = idx[id]; k <= KMAX; k++) g += dist[k - KMIN] * ev(id, k); return fmt$(g * settings.sideAmt * 100, true); };
+  const top = (id) => pct(sideEV(id, fullShoe(settings.decks)), 1);
+  return `<div class="tbl-wrap"><table class="edge"><thead><tr><th>TC</th><th>Rounds</th><th>Lucky Ladies</th><th>King’s Bounty</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <p class="note" style="margin:0">Off the top, Lucky Ladies (${settings.llTable === 'a' ? '1000-200-25-10-4' : '1000-125-19-9-4'}) is ${top('ll')} and King’s Bounty ${top('kb')}.
+    Lucky Ladies pays from TC ${sgn(idx.ll)} and King’s Bounty from TC ${sgn(idx.kb)} (the gold line): bet only from there, at ${fmt$(settings.sideAmt)} a hand,
+    and they add about ${add('ll')} and ${add('kb')} per 100 rounds. Side bets: Settings → Side bets.</p>`;
+}
 function riskStatsHTML(rr, compact) {
   const pctTxt = (p) => (p >= 0.9995 ? '100%' : p < 0.0001 ? 'under 0.01%' : (p * 100).toFixed(p < 0.1 ? 2 : 1) + '%');
   const hrs = (n) => Math.round(n / settings.rph).toLocaleString() + ' hours';
@@ -4047,6 +4236,7 @@ function analysisTabHTML() {
       <div id="rkOut">${riskBlockHTML()}</div>
     </div>
     <div class="detail"><h4>Edge by true count</h4><div id="anaTC">${tcTableHTML()}</div></div>
+    <div class="detail"><h4>Side bets by true count</h4>${sideTableHTML()}</div>
     <div class="grid-stats"><div><span>House edge off the top</span><b class="${toneP(strat.offTop)}">${pct(strat.offTop, 2)}</b></div><div><span>Edge per true count</span><b>${pct((strat.edgeInt(4) - strat.edgeInt(0)) / 4, 2)}</b></div><div><span>Penetration</span><b>${penPct(settings)}%</b></div><div><span>Insurance</span><b>${insAt !== null && devModeNow() !== 'bs' ? 'TC ' + sgn(insAt) + '+' : 'Never'}</b><small>${esc(insTxt)}</small></div></div>
     <p class="note" style="margin:0">Change your bets in Settings \u2192 Betting; this analysis reruns for the new table. Variance is about ${VAR_PER_BET} per unit bet in the estimate.</p>`;
 }
@@ -4118,12 +4308,25 @@ const SCHEMA = [
     { key: 'gradeBets', label: 'Check my bets against my bet table', type: 'toggle' },
     { key: 'startBankroll', label: 'Starting bankroll', type: 'seg', opts: [[2000, '$2K'], [5000, '$5K'], [10000, '$10K'], [25000, '$25K']], sub: 'Applies when you reset the session' },
   ]],
+  ['Side bets', [
+    { key: 'sideLL', label: 'Lucky Ladies', type: 'toggle', sub: (d) => sideSub('ll', d) },
+    { key: 'llTable', label: 'Lucky Ladies pay table', type: 'seg', opts: [['a', '1000-200-25-10-4'], ['b', '1000-125-19-9-4']],
+      sub: 'Queen of hearts pair with dealer blackjack, queen of hearts pair, matched 20, suited 20, any 20' },
+    { key: 'sideKB', label: 'King’s Bounty', type: 'toggle', sub: (d) => sideSub('kb', d) },
+    { key: 'sideAmt', label: 'Side bet', type: 'seg', opts: [[1, '$1'], [5, '$5'], [10, '$10'], [25, '$25'], [50, '$50'], [100, '$100']], sub: 'On each hand, for each side bet you put out' },
+  ]],
   ['Table', [
     { key: 'showBank', label: 'Show the bankroll', type: 'toggle', sub: 'Off hides the bankroll at the top of the table' },
     { key: 'bots', label: 'Other players', type: 'seg', opts: [[0, 'None'], [1, '1'], [2, '2'], [3, '3'], [4, '4']], sub: 'They play basic strategy, and their cards count too' },
     { key: 'speed', label: 'Dealing speed', type: 'seg', opts: [['slow', 'Slow'], ['normal', 'Normal'], ['fast', 'Fast'], ['instant', 'Instant']] },
   ]],
 ];
+// "Pays when your first two cards total 20 … House edge 17.6% off the top; with Hi-Lo it pays from TC +4."
+function sideSub(id, d) {
+  const lt = d.llTable || settings.llTable, he = -sideEV(id, fullShoe(settings.decks), lt), idx = sideIndex(id, lt);
+  return `Pays when your first two cards total 20 (an ace and a 9 count). ${id === 'kb'
+    ? 'Pays 1000 to 1 for a king of spades pair with dealer blackjack, 100 for a king of spades pair, 30 suited kings, 20 another suited pair, 9 a suited 20, 6 two kings, 4 any 20. ' : ''}House edge ${(he * 100).toFixed(1)}% off the top${idx !== null ? `; with Hi-Lo it pays from TC ${sgn(idx)}` : ''}.`;
+}
 function openSettings() {
   const draft = JSON.parse(JSON.stringify(settings));
   const build = () => {
@@ -4276,6 +4479,7 @@ function renderHome() {
       <button class="hbtn" data-go="test"><b>Test game</b><span>No count, no hints, no feedback. A set number of hands, graded at the end.</span></button>
       <button class="hbtn" data-go="review"${unlocked ? '' : ' aria-disabled="true"'}><b>Review mode</b><span>${esc(revSub)}</span>${unlocked ? (mem.items.length ? `<span class="badge gold">${mem.items.length}</span>` : '') : `<span class="badge">${Math.min(mem.hands, REVIEW_MIN_HANDS)}/${REVIEW_MIN_HANDS}</span>`}</button>
       <button class="hbtn" data-go="analyze"><b>Analyze hand</b><span>Simulate any hand at any count: EV and win chances for every play</span></button>
+      <button class="hbtn" data-go="drill"><b>Speed drill</b><span>Count cards against the clock, then name the running count</span></button>
       <button class="hbtn" data-go="settings"><b>Settings</b><span>Rules, deviations, feedback, bets and the table</span></button>
       <button class="hbtn" data-go="help"><b>Help</b><span>Card counting, basic strategy, and how this app works</span></button>
     </div>
@@ -4285,6 +4489,114 @@ function renderHome() {
       ${settings.showBank ? `<div><span>Bankroll</span><b>${fmt$(session.bankroll)}</b></div>` : ''}
       <div><span>Hands you struggle with</span><b style="font:700 14px/1.3 var(--f-body)">${strug.length ? strug.map((s) => esc(sitLabel(s.sk))).join(', ') : 'None yet'}</b></div>
     </div>`;
+}
+
+// ---------- speed drill: count cards against the clock ----------
+// Cards from a freshly shuffled shoe (so a deck's worth doesn't simply count to 0), one to three at a time, at
+// your own pace (tap or Space for the next) or a set speed. Then you name the running count.
+const DRILL_SIZES = [[26, 'Half a deck'], [52, 'A deck'], [104, 'Two decks']];
+const DRILL_PACES = [['self', 'My pace'], [1, '1/s'], [2, '2/s'], [3, '3/s'], [4, '4/s'], [6, '6/s']];
+const drill = Object.assign({ n: 52, per: 1, pace: 'self' }, store.get('drillSetup', {}));
+let drillRun = null;   // the drill under way: { cards, i, t0, t1, timer, tick }
+const loadDrills = () => { const d = store.get('drills', null); return d && d.v === 1 ? d : { v: 1, best: {}, recent: [] }; };
+const drillKeyOf = () => drill.n + '-' + drill.per;
+function openDrill() {
+  openModal(`<div class="mhead"><h2>Speed drill<span class="sub">Keep the running count as the cards come, then name it</span></h2>${closeBtn}</div><div class="mbody" id="drBody"></div>`,
+    { kind: 'drill', onClose: stopDrill });
+  drillSetup();
+}
+function stopDrill() {
+  if (drillRun) { clearTimeout(drillRun.timer); clearInterval(drillRun.tick); drillRun = null; }
+  document.removeEventListener('keydown', drillKey, true);
+}
+// Space or Enter deals the next cards at your own pace (the table's keys are off while a window is open)
+function drillKey(e) {
+  if (!drillRun || drillRun.t1 || drill.pace !== 'self') return;
+  if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); drillNext(); }
+}
+function drillSetup() {
+  stopDrill();
+  const b = $('drBody'), d = loadDrills(), best = d.best[drillKeyOf()];
+  const seg = (k, opts) => `<div class="seg" role="group">${opts.map(([v, l]) => `<button type="button" data-dr="${k}" data-v='${JSON.stringify(v)}' class="${drill[k] === v ? 'on' : ''}" aria-pressed="${drill[k] === v}">${l}</button>`).join('')}</div>`;
+  const recent = d.recent.slice(0, 6).map((x) => `<li><span class="${x.ok ? 'pos' : 'neg'}">${x.ok ? '✓' : '✕'}</span> ${x.n} cards, ${x.per} at a time, ${x.pace === 'self' ? 'my pace' : x.pace + ' a second'} · ${x.secs.toFixed(1)} s</li>`).join('');
+  b.innerHTML = `
+    <div class="srow"><div class="lab"><b>Cards</b><small>Dealt from a shuffled ${settings.decks}-deck shoe, so the count can end anywhere</small></div>${seg('n', DRILL_SIZES)}</div>
+    <div class="srow"><div class="lab"><b>At a time</b><small>Two or three at once trains you to cancel pairs</small></div>${seg('per', [[1, '1'], [2, '2'], [3, '3']])}</div>
+    <div class="srow"><div class="lab"><b>Speed</b><small>My pace: tap the cards, or press Space, for the next ones as fast as you can count them</small></div>${seg('pace', DRILL_PACES)}</div>
+    <p class="note" style="margin:0">${best ? `Your best at your own pace with these cards: <b>${best.secs.toFixed(1)} s</b> (${best.cps.toFixed(1)} cards a second).` : 'Pros count down a deck in about 25 seconds, one card at a time.'}</p>
+    ${recent ? `<ul class="drrecent">${recent}</ul>` : ''}
+    <div style="display:flex;justify-content:flex-end"><button class="btn primary" id="drGo" data-autofocus>Start</button></div>`;
+  b.querySelectorAll('[data-dr]').forEach((x) => { x.onclick = () => { drill[x.dataset.dr] = JSON.parse(x.dataset.v); store.set('drillSetup', drill); drillSetup(); }; });
+  $('drGo').onclick = drillStart;
+}
+function drillStart() {
+  const decks = Math.max(settings.decks, Math.ceil(drill.n / 52)), all = [];
+  for (let d = 0; d < decks; d++) for (let s = 0; s < 4; s++) for (let r = 1; r <= 13; r++) all.push({ r, s, v: Math.min(r, 10), id: 'dr' + all.length });
+  drillRun = { cards: shuffle(all).slice(0, drill.n), i: 0, t0: 0, t1: 0, timer: 0, tick: 0 };
+  $('drBody').innerHTML = `<div class="drill">
+      <div class="drcards" id="drCards" role="button" tabindex="0" aria-label="Next cards"></div>
+      <div class="drmeta"><span id="drProg">0 / ${drill.n}</span><span id="drTime">0.0 s</span></div>
+      <div class="drbtns"><button class="btn" id="drStop">Stop</button>${drill.pace === 'self' ? '<button class="btn primary" id="drNext">Next</button>' : ''}</div></div>`;
+  $('drStop').onclick = drillSetup;
+  if (drill.pace === 'self') { $('drNext').onclick = drillNext; $('drCards').onclick = drillNext; document.addEventListener('keydown', drillKey, true); }
+  drillNext();
+}
+function drillNext() {
+  const r = drillRun;
+  if (!r || r.t1) return;
+  if (r.i >= r.cards.length) { drillAsk(); return; }
+  if (!r.t0) {
+    r.t0 = performance.now();
+    r.tick = setInterval(() => { const t = $('drTime'); if (t && drillRun === r) t.textContent = ((performance.now() - r.t0) / 1000).toFixed(1) + ' s'; }, 100);
+  }
+  const group = r.cards.slice(r.i, r.i + drill.per);
+  r.i += group.length;
+  const box = $('drCards');
+  box.innerHTML = '';
+  for (const c of group) box.appendChild(makeCard(c, false));
+  $('drProg').textContent = `${r.i} / ${r.cards.length}`;
+  if (drill.pace !== 'self') r.timer = setTimeout(drillNext, (1000 * group.length) / drill.pace);
+}
+function drillAsk() {
+  const r = drillRun;
+  clearTimeout(r.timer); clearInterval(r.tick);
+  r.t1 = performance.now();
+  document.removeEventListener('keydown', drillKey, true);
+  $('drBody').innerHTML = `<p class="az-sum" style="margin:0">${r.cards.length} cards in <b>${((r.t1 - r.t0) / 1000).toFixed(1)} s</b>. What is the running count?</p>
+    <div class="az-num"><button type="button" id="drM" aria-label="Minus one">−</button><input type="number" id="drRc" step="1" value="0" aria-label="Running count"><button type="button" id="drP" aria-label="Plus one">+</button>
+      <button class="btn primary" id="drCheck" style="margin-left:auto">Check</button></div>`;
+  const inp = $('drRc'), set = (v) => { inp.value = v; };
+  $('drM').onclick = () => set((parseInt(inp.value, 10) || 0) - 1);
+  $('drP').onclick = () => set((parseInt(inp.value, 10) || 0) + 1);
+  inp.onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); drillCheck(); } };
+  $('drCheck').onclick = drillCheck;
+  inp.focus(); inp.select();
+}
+function drillCheck() {
+  const r = drillRun, guess = parseInt($('drRc').value, 10) || 0;
+  const rc = r.cards.reduce((a, c) => a + HILO[c.v], 0), ok = guess === rc;
+  const secs = (r.t1 - r.t0) / 1000, cps = r.cards.length / Math.max(0.1, secs);
+  const d = loadDrills(), key = drillKeyOf();
+  let best = false;
+  if (ok && drill.pace === 'self' && (!d.best[key] || secs < d.best[key].secs)) { d.best[key] = { secs, cps }; best = true; }
+  d.recent.unshift({ n: r.cards.length, per: drill.per, pace: drill.pace, ok, secs, at: Date.now() });
+  d.recent = d.recent.slice(0, 20);
+  store.set('drills', d);
+  // the cards again, with the running count after each group, to find a slip
+  let run = 0, trail = '';
+  for (let i = 0; i < r.cards.length; i += drill.per) {
+    const g = r.cards.slice(i, i + drill.per);
+    run += g.reduce((a, c) => a + HILO[c.v], 0);
+    trail += `<span class="drstep">${g.map((c) => miniCard(c.r, c.s)).join('')}<b>${sgn(run)}</b></span>`;
+  }
+  $('drBody').innerHTML = `<div class="drres ${ok ? 'ok' : 'bad'}"><span class="ico">${ok ? '✓' : '✕'}</span><div><b>${ok ? `Right: ${sgn(rc)}` : `You said ${sgn(guess)}, it was ${sgn(rc)}`}</b>
+      <span>${r.cards.length} cards in ${secs.toFixed(1)} s · ${cps.toFixed(1)} cards a second${best ? ' · a new best' : ''}</span></div></div>
+    <details><summary>Show the cards</summary><div class="drtrail">${trail}</div></details>
+    <div style="display:flex;gap:10px;justify-content:flex-end"><button class="btn" id="drSetup">Change setup</button><button class="btn primary" id="drAgain" data-autofocus>Again</button></div>`;
+  drillRun = null;
+  $('drSetup').onclick = drillSetup;
+  $('drAgain').onclick = drillStart;
+  $('drAgain').focus();
 }
 
 // ---------- help ----------
@@ -4322,12 +4634,19 @@ function openHelp() {
         </div>
         <p>After each decision the feedback shows your play and its EV in dollars, then your chart’s play (or the next best play, when you made your chart’s) and its EV. With deviations on, a third line lists the index plays for that hand.</p>
         <p>Feedback hides itself while the count is hidden (the eye button, or C), so you can count without hints. When a hand is over, <b>Review this hand</b> shows each decision with the EV of every play.</p></section>
+      <section><h3>Side bets</h3>
+        <p>Lucky Ladies and King’s Bounty pay when your first two cards total 20 (an ace and a 9 count), more for suited and matched 20s, and up to 1000 to 1 for a pair of queens of hearts (Lucky Ladies) or kings of spades (King’s Bounty) when the dealer has blackjack. Turn them on in Settings → Side bets and put them out with the buttons above Deal (L and K on a keyboard). They are settled on each hand once the dealer has checked for blackjack.</p>
+        <ul>
+          <li><b>Counting them:</b> they cost about 18% and 23% off the top, but they pay on tens, so the Hi-Lo true count tracks them closely. With your rules Lucky Ladies pays from TC ${sgn(sideIndex('ll') ?? 4)} and King’s Bounty from TC ${sgn(sideIndex('kb') ?? 6)}. After each round you are told when you bet against the count, and auto bets put them out from there on their own.</li>
+          <li><b>Game analysis</b> shows each side bet’s EV at every true count and what betting it from its index adds per 100 rounds.</li>
+        </ul></section>
       <section><h3>Modes</h3>
         <ul>
           <li><b>Play:</b> your shoe, your bankroll and your session stats, with a report at the end of each shoe.</li>
           <li><b>Random:</b> every hand starts at a random point in a freshly shuffled shoe, so you face a real count at any depth. Your bankroll is untouched.</li>
           <li><b>Test game:</b> choose how many hands. The count, true count and decks left are hidden, and there are no hints, feedback or bet help. Everything is graded at the end, including the running count you give.</li>
           <li><b>Review mode:</b> unlocks after ${REVIEW_MIN_HANDS} hands. It deals your misplays again at the same count (mistakes far more often than marginal plays), plus tough hands and the situations you get wrong most. Sometimes the count or your total is a little different. Each right answer makes a misplay less likely to come back, and after a few it retires.</li>
+          <li><b>Speed drill:</b> cards come one to three at a time, at your own pace (tap, or Space) or a set speed, and then you name the running count. You see your time and cards a second, and the cards again with the count after each, to find a slip. Your best times are kept.</li>
           <li><b>Analyze hand:</b> pick any cards, upcard, running or true count, depth and rules. A simulation deals the hand a million times from shoes at that count and shows the EV of every play with its 95% range, how often it wins, pushes and loses, and which play is best.</li>
         </ul></section>
       <section><h3>Keyboard</h3>
@@ -4624,6 +4943,7 @@ function wire() {
     if (g === 'settings') openSettings();
     else if (g === 'help') openHelp();
     else if (g === 'analyze') openAnalyze();
+    else if (g === 'drill') openDrill();
     else enterMode(g);
   });
   $('btnChart').onclick = openChart;
@@ -4639,6 +4959,7 @@ function wire() {
     else if (b.id === 'btnClear') clearBet();
     else if (b.id === 'btnRamp') { followRamp(tcNow()); renderTable(); renderDock(); }
     else if (b.dataset.spots) setSpots(+b.dataset.spots);
+    else if (b.dataset.side) toggleSide(b.dataset.side);
     else if (b.id === 'btnDeal') onDeal();
     else if (b.dataset.act) onAct(b.dataset.act);
     else if (b.id === 'btnInsY') onIns(true);
@@ -4674,13 +4995,15 @@ function wire() {
       if (k === 'enter' || k === ' ') { e.preventDefault(); onDeal(); }
       else if (k === 'backspace') clearBet();
       else if (k >= '1' && k <= '5') addChip(CHIPS[+k - 1]);
+      else if (k === 'l') toggleSide('ll');
+      else if (k === 'k') toggleSide('kb');
     }
   });
   window.addEventListener('resize', () => renderRail());
 }
 
 // read-only handle for inspecting a running table from the console
-window.cutcard = { get state() { return { phase, round, count, shoe, settings, session, shoeStats, strat, bet, spots, modal: modal && modal.kind, screen, tableMode, mem, review, test, lastFeedback }; } };
+window.cutcard = { get state() { return { phase, round, count, shoe, settings, session, shoeStats, strat, bet, spots, sideOn, modal: modal && modal.kind, screen, tableMode, mem, review, test, lastFeedback }; } };
 
 // ---------- boot ----------
 function boot() {
