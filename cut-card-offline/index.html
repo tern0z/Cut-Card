@@ -422,6 +422,7 @@ table.tbl { border-collapse: collapse; width: 100%; font-size: 12.5px; min-width
 .switch::after { content: ""; position: absolute; top: 4px; left: 4px; width: 22px; height: 22px; border-radius: 50%; background: #d4ddd8; transition: transform .18s; }
 .switch[aria-checked="true"] { background: var(--gold); box-shadow: none; }
 .switch[aria-checked="true"]::after { transform: translateX(20px); background: #fff; }
+.switch:disabled { opacity: .45; cursor: default; }
 .rangebox { display: flex; flex-direction: column; gap: 6px; flex: 1 1 220px; }
 .rangebox input { width: 100%; accent-color: var(--gold); }
 .rangebox output { font: 600 12.5px var(--f-mono); color: var(--text-2); }
@@ -837,6 +838,8 @@ function splitDP(A, B, q, sMax) {
 // EV of each legal action for a two-card hand (a,b) vs upcard, per unit bet, given no dealer BJ.
 // comp = unseen cards (player's cards and upcard removed). Exact for standing and for the first card
 // drawn on a hit, a double, or each split hand.
+// Split aces get one card each unless the rules say otherwise: rules.hsa lets you hit them, rules.rsa resplit
+// them, and rules.dsa plays them like any split hand (hit, double after a split, resplit).
 function handEVs(comp, up, a, b, rules) {
   const hard = a + b, ace = (a === 1 || b === 1) ? 1 : 0;
   const t0 = tablesFor(comp, up, rules);
@@ -863,7 +866,7 @@ function handEVs(comp, up, a, b, rules) {
     const x = a;
     const v2 = (r) => {
       const t = tr[r], hh = x + r, aa = (x === 1 || r === 1) ? 1 : 0, bt = bestTotal(hh, aa);
-      if (x === 1) return rules.hsa ? Math.max(t.se[bt], t.H[hh * 2 + aa]) : t.se[bt];
+      if (x === 1 && !rules.dsa) return rules.hsa ? Math.max(t.se[bt], t.H[hh * 2 + aa]) : t.se[bt];
       let v = bt >= 21 ? t.se[bt] : Math.max(t.se[bt], t.H[hh * 2 + aa]);
       if (rules.das && canDoubleTotal(hh, aa, rules)) v = Math.max(v, dblFrom(t, hh, aa));
       return v;
@@ -871,7 +874,7 @@ function handEVs(comp, up, a, b, rules) {
     const q = p1[x];
     let A = 0; for (let r = 1; r <= 10; r++) if (r !== x && p1[r] > 0) A += p1[r] * v2(r);
     const B = q > 0 ? v2(x) : 0;
-    const sMax = (x !== 1 || rules.rsa) ? Math.max(0, Math.min(rules.maxHands, 8) - 2) : 0;
+    const sMax = (x !== 1 || rules.rsa || rules.dsa) ? Math.max(0, Math.min(rules.maxHands, 8) - 2) : 0;
     out.P = splitDP(A, B, q, sMax);
   }
   return out;
@@ -887,15 +890,15 @@ function handBestQuick(comp, up, a, b, rules) {
     const x = a, pp = t.pp;
     const v2 = (r) => {
       const hh = x + r, aa = (x === 1 || r === 1) ? 1 : 0, bt = bestTotal(hh, aa);
-      if (x === 1) return rules.hsa ? Math.max(t.se[bt], t.H[hh * 2 + aa]) : t.se[bt];
-      let v = Math.max(t.se[bt], t.H[hh * 2 + aa]);
+      if (x === 1 && !rules.dsa) return rules.hsa ? Math.max(t.se[bt], t.H[hh * 2 + aa]) : t.se[bt];
+      let v = bt >= 21 ? t.se[bt] : Math.max(t.se[bt], t.H[hh * 2 + aa]);
       if (rules.das && canDoubleTotal(hh, aa, rules)) v = Math.max(v, dblFrom(t, hh, aa));
       return v;
     };
     const q = pp[x];
     let A = 0; for (let r = 1; r <= 10; r++) if (r !== x && pp[r] > 0) A += pp[r] * v2(r);
     const B = q > 0 ? v2(x) : 0;
-    const sMax = (x !== 1 || rules.rsa) ? Math.max(0, Math.min(rules.maxHands, 8) - 2) : 0;
+    const sMax = (x !== 1 || rules.rsa || rules.dsa) ? Math.max(0, Math.min(rules.maxHands, 8) - 2) : 0;
     best = Math.max(best, splitDP(A, B, q, sMax));
   }
   return best;
@@ -1472,10 +1475,10 @@ function simulateGame(strat, cfg) {
           if (hi.total >= 21) break;
           const two = h.c.length === 2, pair = two && h.c[0] === h.c[1];
           let fromSpot = 0; for (const x of hands) if (x.spot === h.spot) fromSpot++;   // the split rule is per starting hand
-          const canHit = !h.aces || R.hsa;
-          const canSplit = pair && fromSpot < maxH && onTable < 8 && (h.c[0] !== 1 || !h.split || R.rsa);
+          const canHit = !h.aces || R.hsa || R.dsa;
+          const canSplit = pair && fromSpot < maxH && onTable < 8 && (h.c[0] !== 1 || !h.split || R.rsa || R.dsa);
           if (!canHit && !canSplit) break;
-          const canDouble = two && !h.aces && (!h.split || R.das) && canDoubleTotal(hi.hard, hi.ace, R);
+          const canDouble = two && (!h.aces || R.dsa) && (!h.split || R.das) && canDoubleTotal(hi.hard, hi.ace, R);
           const canSurrender = R.surrender && two && !h.split && fromSpot === 1;
           const a = decide(strat, { vals: h.c, up, tcInt: tcNow(), canDouble, canSplit, canSurrender, isPair: pair, canHit }, opts).action;
           if (a === 'S') break;
@@ -1670,10 +1673,10 @@ function simulateHand(cfg, onBatch) {
       while (pending > 0) {
         pending--;
         let c = card(i++);
-        while (c === x0 && made < maxH && (x0 !== 1 || R.rsa)) { made++; pending++; c = card(i++); }
+        while (c === x0 && made < maxH && (x0 !== 1 || R.rsa || R.dsa)) { made++; pending++; c = card(i++); }
         let hard = x0 + c, ace = x0 === 1 || c === 1 ? 1 : 0, mult = 1, pt;
-        if (x0 === 1 && !R.hsa) pt = bestTotal(hard, ace);
-        else if (x0 !== 1 && dblT[hard * 2 + ace]) { const c2 = card(i++); hard += c2; if (c2 === 1) ace = 1; pt = bestTotal(hard, ace); if (pt > 21) pt = 22; mult = 2; }
+        if (x0 === 1 && !R.hsa && !R.dsa) pt = bestTotal(hard, ace);
+        else if ((x0 !== 1 || R.dsa) && dblT[hard * 2 + ace]) { const c2 = card(i++); hard += c2; if (c2 === 1) ace = 1; pt = bestTotal(hard, ace); if (pt > 21) pt = 22; mult = 2; }
         else { pt = playHits(hard, ace, i); i = pEnd; }
         ends.push(pt); mults.push(mult);
       }
@@ -1713,6 +1716,7 @@ const reduceMotion = !!(window.matchMedia && matchMedia('(prefers-reduced-motion
 // ---------- settings ----------
 const DEFAULTS = {
   decks: 6, s17: true, das: true, surrender: true, maxHands: 4, rsa: true, hsa: false, bjPays: 1.5, doubleOn: 'any', cutDecks: 1, burn: true,
+  dsa: false,   // split aces play like any split hand: hit, double, resplit
   tcMode: 'floor', deckEst: 'exact',
   useDevs: false, devMode: 'adv', devRange: 8, customDevs: [], feedback: 'all', hint: false, pauseOnMistake: false, showBank: true,
   betMode: 'manual', unit: 25, rampBets: [25, 25, 25, 25, 50, 100, 150, 200, 200, 200, 200, 200, 200, 200], gradeBets: true, startBankroll: 10000,
@@ -1727,12 +1731,12 @@ const MAX_SPOTS = 4;
 // the bet table has one entry per true count: TC -3 or lower, -2 ... +9, +10 or higher
 const RAMP_TCS = [-3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const RAMP_LABELS = ['\u2264\u22123', '\u22122', '\u22121', '0', '+1', '+2', '+3', '+4', '+5', '+6', '+7', '+8', '+9', '\u2265+10'];
-const SHOE_KEYS = ['decks', 's17', 'das', 'surrender', 'maxHands', 'rsa', 'hsa', 'bjPays', 'doubleOn', 'cutDecks', 'burn'];
+const SHOE_KEYS = ['decks', 's17', 'das', 'surrender', 'maxHands', 'rsa', 'hsa', 'dsa', 'bjPays', 'doubleOn', 'cutDecks', 'burn'];
 function sanitize(src) {
   const o = Object.assign({}, DEFAULTS, src || {});
   const pick = (v, list, d) => (list.includes(v) ? v : d);
   o.decks = pick(+o.decks, [1, 2, 4, 6, 8], DEFAULTS.decks);
-  for (const k of ['s17', 'das', 'surrender', 'rsa', 'hsa', 'burn', 'hint', 'pauseOnMistake', 'gradeBets', 'countCheck', 'randomChecks', 'useDevs', 'showBank', 'multiHands', 'sideLL', 'sideKB']) o[k] = !!o[k];
+  for (const k of ['s17', 'das', 'surrender', 'rsa', 'hsa', 'dsa', 'burn', 'hint', 'pauseOnMistake', 'gradeBets', 'countCheck', 'randomChecks', 'useDevs', 'showBank', 'multiHands', 'sideLL', 'sideKB']) o[k] = !!o[k];
   o.llTable = pick(o.llTable, ['a', 'b'], 'a');
   o.sideAmt = pick(+o.sideAmt, [1, 5, 10, 25, 50, 100], 5);
   o.maxHands = pick(+o.maxHands, [2, 3, 4, 99], DEFAULTS.maxHands);
@@ -1794,7 +1798,8 @@ const pctOf = (a, b) => (b ? Math.round((a / b) * 100) + '%' : '–');
 const penPct = (s) => Math.round((1 - s.cutDecks / s.decks) * 1000) / 10;
 function rulesText(s, short) {
   const parts = [s.decks + (s.decks > 1 ? ' decks' : ' deck'), s.s17 ? 'S17' : 'H17', s.das ? 'DAS' : 'no DAS', s.surrender ? 'late surrender' : 'no surrender',
-    s.maxHands >= 99 ? 'unlimited splits' : 'split to ' + s.maxHands, s.rsa ? 'RSA' : null, s.hsa ? 'HSA' : null,
+    s.maxHands >= 99 ? 'unlimited splits' : 'split to ' + s.maxHands,
+    s.dsa ? 'split aces play like any hand' : null, s.rsa && !s.dsa ? 'RSA' : null, s.hsa && !s.dsa ? 'HSA' : null,
     s.doubleOn !== 'any' ? 'double ' + s.doubleOn : null, s.bjPays === 1.2 ? '6:5' : null, penPct(s) + '% pen'];
   const out = parts.filter(Boolean);
   return short ? out.slice(0, 4).join(' · ') + ' · ' + penPct(s) + '% pen' : out.join(' · ');
@@ -1829,8 +1834,10 @@ let session = loadSession();
 // ---------- strategy ----------
 let strat = null;
 function stratRules() {
-  return { decks: settings.decks, s17: settings.s17, das: settings.das, surrender: settings.surrender, maxHands: Math.min(settings.maxHands, 8), rsa: settings.rsa,
-    hsa: settings.hsa, bjPays: settings.bjPays, doubleOn: settings.doubleOn, cutDecks: settings.cutDecks, tcMode: settings.tcMode };
+  // playing split aces like any hand includes hitting and resplitting them
+  return { decks: settings.decks, s17: settings.s17, das: settings.das, surrender: settings.surrender, maxHands: Math.min(settings.maxHands, 8),
+    rsa: settings.rsa || settings.dsa, hsa: settings.hsa || settings.dsa, dsa: settings.dsa, bjPays: settings.bjPays, doubleOn: settings.doubleOn,
+    cutDecks: settings.cutDecks, tcMode: settings.tcMode };
 }
 // The index set in force: the chosen set when deviations are on, otherwise basic strategy only.
 const devModeNow = () => (settings.useDevs ? settings.devMode : 'bs');
@@ -2124,11 +2131,11 @@ function allowedFor(h, hands) {
   if (h.done || hi.total >= 21) return [];
   const two = v.length === 2, pair = two && v[0] === v[1];
   const fromSpot = hands.filter((x) => x.spot === h.spot).length;   // the split rule counts the hands from one starting hand
-  const acts = [];
-  if (!h.splitAces || settings.hsa) acts.push('H');
+  const acts = [], R = stratRules();
+  if (!h.splitAces || R.hsa) acts.push('H');
   acts.push('S');
-  if (two && !h.splitAces && (!h.fromSplit || settings.das) && canDoubleTotal(hi.hard, hi.ace, stratRules())) acts.push('D');
-  if (pair && fromSpot < maxHandsGame() && hands.length < TABLE_HANDS && (v[0] !== 1 || !h.fromSplit || settings.rsa)) acts.push('P');
+  if (two && (!h.splitAces || R.dsa) && (!h.fromSplit || R.das) && canDoubleTotal(hi.hard, hi.ace, R)) acts.push('D');
+  if (pair && fromSpot < maxHandsGame() && hands.length < TABLE_HANDS && (v[0] !== 1 || !h.fromSplit || R.rsa)) acts.push('P');
   if (settings.surrender && two && !h.fromSplit && fromSpot === 1) acts.push('R');
   return acts;
 }
@@ -4301,8 +4308,10 @@ const SCHEMA = [
     { key: 'das', label: 'Double after split', type: 'toggle' },
     { key: 'surrender', label: 'Late surrender', type: 'toggle' },
     { key: 'maxHands', label: 'Split up to', type: 'seg', opts: [[2, '2 hands'], [3, '3'], [4, '4'], [99, 'Unlimited']], sub: 'Unlimited allows up to 8 hands' },
-    { key: 'rsa', label: 'Resplit aces', type: 'toggle' },
-    { key: 'hsa', label: 'Hit split aces', type: 'toggle' },
+    { key: 'rsa', label: 'Resplit aces', type: 'toggle', lock: (d) => d.dsa },
+    { key: 'hsa', label: 'Hit split aces', type: 'toggle', lock: (d) => d.dsa },
+    { key: 'dsa', label: 'Split aces play like any hand', type: 'toggle',
+      sub: (d) => `Hit, double and resplit them like any other split hand${d.das ? '' : ' (doubling needs Double after split)'}. A ten on a split ace is 21, not blackjack.` },
     { key: 'doubleOn', label: 'Double on', type: 'seg', opts: [['any', 'Any two cards'], ['9-11', '9–11'], ['10-11', '10–11']] },
     { key: 'bjPays', label: 'Blackjack pays', type: 'seg', opts: [[1.5, '3:2'], [1.2, '6:5']] },
     { key: 'cutDecks', label: 'Cut card', type: 'range' },
@@ -4359,10 +4368,10 @@ function openSettings() {
     for (const [g, items] of SCHEMA) {
       h += `<section class="sgroup"><h3 class="sec-h">${g}</h3>`;
       for (const it of items) {
-        const val = draft[it.key];
+        const val = draft[it.key], locked = !!(it.lock && it.lock(draft));   // locked on by another setting
         let ctl = '';
         if (it.type === 'seg') ctl = `<div class="seg" role="group" aria-label="${esc(it.label)}">${it.opts.map(([v, l]) => `<button type="button" data-k="${it.key}" data-v='${JSON.stringify(v)}' class="${v === val ? 'on' : ''}" aria-pressed="${v === val}">${l}</button>`).join('')}</div>`;
-        else if (it.type === 'toggle') ctl = `<button type="button" class="switch" role="switch" id="sw-${it.key}" data-toggle="${it.key}" aria-checked="${!!val}" aria-label="${esc(it.label)}"></button>`;
+        else if (it.type === 'toggle') ctl = `<button type="button" class="switch" role="switch" id="sw-${it.key}" data-toggle="${it.key}" aria-checked="${!!val || locked}" aria-label="${esc(it.label)}"${locked ? ' disabled' : ''}></button>`;
         else if (it.type === 'range') {
           const max = Math.max(0.25, draft.decks - 0.5);
           ctl = `<div class="rangebox"><input type="range" id="cutRange" min="0.25" max="${max}" step="0.25" value="${Math.min(draft.cutDecks, max)}"><output id="cutOut"></output></div>`;
@@ -4371,7 +4380,7 @@ function openSettings() {
             <div class="presets">${PRESETS.map(([id, l]) => `<button type="button" class="btn small" data-preset="${id}">${l}</button>`).join('')}</div></div>`;
         else if (it.type === 'riskLive') ctl = '<div class="risklive" id="riskLive"></div>';
         else if (it.type === 'customDevs') ctl = `<div class="cdevs">${val.length ? val.map((k) => `<span class="cdev">${esc(customDevLabel(k))}<button type="button" data-rmdev="${esc(k)}" aria-label="Remove ${esc(customDevLabel(k))}">×</button></span>`).join('') : '<span class="note">None yet. When a play off your chart beats it, the feedback offers to add it.</span>'}</div>`;
-        const sub = typeof it.sub === 'function' ? it.sub(draft) : it.sub;
+        const sub = locked ? 'On while split aces play like any hand' : typeof it.sub === 'function' ? it.sub(draft) : it.sub;
         h += `<div class="srow"><div class="lab"><b>${it.label}</b>${sub ? `<small>${sub}</small>` : ''}</div>${ctl}</div>`;
       }
       h += '</section>';
@@ -4394,7 +4403,8 @@ function openSettings() {
       draft[b.dataset.k] = JSON.parse(b.dataset.v); if (b.dataset.k === 'decks') draft.cutDecks = Math.min(Math.max(0.25, draft.cutDecks), Math.max(0.25, draft.decks - 0.5)); refresh(); warn(); }; });
     body.querySelectorAll('[data-toggle]').forEach((b) => { b.onclick = () => {
       draft[b.dataset.toggle] = !draft[b.dataset.toggle]; b.setAttribute('aria-checked', String(draft[b.dataset.toggle]));
-      if (b.dataset.toggle === 'multiHands') refresh();   // shows or hides the hands in the bet table
+      // the hands in the bet table, the split aces locks and the doubling note follow these
+      if (['multiHands', 'dsa', 'das'].includes(b.dataset.toggle)) refresh();
       warn();
     }; });
     body.querySelectorAll('[data-rh]').forEach((s) => { s.onchange = () => { draft.rampHands[+s.dataset.rh] = +s.value; s.classList.toggle('one', +s.value === 1); updateRisk(); }; });
@@ -4756,6 +4766,7 @@ const AZ_RULES = [
   ['maxHands', 'Split to', [[2, '2'], [3, '3'], [4, '4'], [8, 'Any']]],
   ['rsa', 'Resplit aces', [[true, 'Yes'], [false, 'No']]],
   ['hsa', 'Hit split aces', [[true, 'Yes'], [false, 'No']]],
+  ['dsa', 'Split aces play like any hand', [[true, 'Yes'], [false, 'No']]],
 ];
 // [win, push, lose] standing on a total, against a dealer who has no blackjack
 function standOut(dd, total) {
@@ -4824,9 +4835,10 @@ function analyzeHand(comp, up, vals, R) {
       if (!(p > 0)) continue;
       const t = tr[r], hh = x + r, aa = x === 1 || r === 1 ? 1 : 0, bt = bestTotal(hh, aa);
       let y;
-      if (x === 1 && !R.hsa) y = standOut(t.dd, bt);
+      if (x === 1 && !R.hsa && !R.dsa) y = standOut(t.dd, bt);
       else {
-        const st = t.se[bt], hit = bt >= 21 ? -9 : t.H[hh * 2 + aa], dbl = R.das && bt < 21 && canDoubleTotal(hh, aa, R) ? dblFrom(t, hh, aa) : -9;
+        const st = t.se[bt], hit = bt >= 21 ? -9 : t.H[hh * 2 + aa];
+        const dbl = R.das && (x !== 1 || R.dsa) && bt < 21 && canDoubleTotal(hh, aa, R) ? dblFrom(t, hh, aa) : -9;
         y = dbl > Math.max(st, hit) ? drawOut(t, hh, aa, true) : hit > st ? drawOut(t, hh, aa, false) : standOut(t.dd, bt);
       }
       o[0] += p * y[0]; o[1] += p * y[1]; o[2] += p * y[2];
@@ -4864,7 +4876,15 @@ function renderAnalyze() {
       <div class="az-num"><span class="note" style="min-width:104px">Decks left</span><input type="range" id="azDl" min="0.5" max="${R.decks}" step="0.25" value="${az.dl}" aria-label="Decks left"><output id="azDlOut">${az.dl} of ${R.decks}</output></div>
       <p class="note" style="margin:0">The running count includes your cards and the upcard. The true count is the running count over the decks left.</p></div>
     <div class="az-out" id="azOut"></div>`;
-  body.querySelectorAll('[data-azr]').forEach((b) => { b.onclick = () => { R[b.dataset.azr] = JSON.parse(b.dataset.v); if (b.dataset.azr === 'decks') az.dl = null; renderAnalyze(); }; });
+  body.querySelectorAll('[data-azr]').forEach((b) => { b.onclick = () => {
+    const k = b.dataset.azr, v = JSON.parse(b.dataset.v);
+    R[k] = v;
+    if (k === 'decks') az.dl = null;
+    // playing split aces like any hand includes hitting and resplitting them
+    if (k === 'dsa' && v) R.rsa = R.hsa = true;
+    if ((k === 'rsa' || k === 'hsa') && !v) R.dsa = false;
+    renderAnalyze();
+  }; });
   body.querySelectorAll('[data-azup]').forEach((b) => { b.onclick = () => { az.up = +b.dataset.azup; renderAnalyze(); }; });
   body.querySelectorAll('[data-azadd]').forEach((b) => { b.onclick = () => { az.cards.push(+b.dataset.azadd); renderAnalyze(); }; });
   body.querySelectorAll('[data-azrm]').forEach((b) => { b.onclick = () => { az.cards.splice(+b.dataset.azrm, 1); renderAnalyze(); }; });
