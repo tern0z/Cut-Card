@@ -1428,7 +1428,8 @@ function simulateGame(strat, cfg) {
   const shuffleShoe = () => { for (let i = N - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; const t = shoe[i]; shoe[i] = shoe[j]; shoe[j] = t; } };
   let pos = 0, rc = 0, seen = 0;
   const fresh = () => { shuffleShoe(); pos = 1; rc = 0; seen = 0; };   // one burn card
-  const draw = () => { if (pos >= N) { shuffleShoe(); pos = 0; } return shoe[pos++]; };
+  // out of cards in the middle of a round: shuffle and carry on with the count started again
+  const draw = () => { if (pos >= N) { shuffleShoe(); pos = 0; rc = 0; seen = 0; } return shoe[pos++]; };
   const see = (v) => { rc += HILO[v]; seen++; };
   const tcNow = () => {
     const t = rc / (Math.max(1, N - seen) / 52);
@@ -1969,6 +1970,7 @@ class Shoe {
       const extra = [];
       for (let s = 0; s < 4; s++) for (let r = 1; r <= 13; r++) extra.push({ r, s, v: Math.min(r, 10), id: this.nextId++ });
       this.cards.push(...shuffle(extra));
+      this.total += extra.length;   // a balanced deck: the running count carries on, with a deck more to come
     }
     const c = this.cards[this.pos++];
     if (this.pos >= this.cutPos) this.cutOut = true;
@@ -2244,8 +2246,29 @@ const hintOn = () => settings.hint && tableMode !== 'test';
 const fbShown = () => tableMode === 'review' || (tableMode !== 'test' && settings.feedback !== 'off' && countVisible);
 
 // ---------- dealing ----------
+// A deep cut card and many hands can empty the shoe in the middle of a round. As in a casino, the dealer then
+// shuffles the discards and finishes the round from them, leaving the cards on the table where they are. The
+// discards are the cards you have already counted, so the count starts again from the cards on the table (it is
+// minus your count before the round, since a whole shoe counts to zero).
+function drawCard() {
+  if (shoe.pos >= shoe.cards.length && round && shoe.roundStart !== undefined) reshuffleDiscards();
+  return shoe.draw();
+}
+function reshuffleDiscards() {
+  const table = shoe.cards.slice(shoe.roundStart, shoe.pos);
+  const discards = shuffle(shoe.cards.slice(0, shoe.roundStart).map((c) => ({ r: c.r, s: c.s, v: c.v, id: shoe.nextId++ })));
+  shoe.cards = table.concat(discards);
+  shoe.roundStart = 0; shoe.pos = table.length;
+  shoe.total = shoe.cards.length;
+  shoe.cutPos = 0;
+  shoe.cutOut = shoe.exhausted = true;
+  const hole = round.dealer.holeHidden ? round.dealer.holeId : null;
+  count.rc = 0; count.n = 0; count.seen = new Int32Array(11);
+  for (const c of table) if (c.id !== hole) see(c);
+  round.reshuffled = true;
+}
 async function dealTo(hand) {
-  const c = shoe.draw();
+  const c = drawCard();
   hand.cards.push(c);
   see(c);
   noteCut();
@@ -2254,7 +2277,7 @@ async function dealTo(hand) {
   return c;
 }
 async function dealDealer(faceDown) {
-  const c = shoe.draw();
+  const c = drawCard();
   round.dealer.cards.push(c);
   if (faceDown) round.dealer.holeId = c.id; else see(c);
   noteCut();
@@ -2318,6 +2341,7 @@ async function playRound() {
   if (sitting && !seats.some((s) => s.kind === 'bot')) seats.splice(seats.indexOf(you) + 1, 0, { kind: 'bot', name: 'Other player', hands: [], active: -1, phantom: true });
   for (const s of seats) if (s.kind === 'bot') { s.hands = [newHand(settings.unit)]; s.active = -1; }
   render();
+  shoe.roundStart = shoe.pos;   // the cards from here on are this round's, on the table
   for (let pass = 0; pass < 2; pass++) {
     for (const s of seats) for (const h of s.hands) await dealTo(h);
     await dealDealer(pass === 1);
@@ -3442,7 +3466,8 @@ function openHandReview(r) {
 function renderMsg() {
   const el = $('msg');
   let h = '';
-  if (cutNotice && phase !== 'shoe-end' && tableMode === 'play') h += '<div class="banner cut">Cut card is out · last round of the shoe</div>';
+  if (round && round.reshuffled && phase !== 'shoe-end') h += '<div class="banner cut">Out of cards: the discards are shuffled to finish the round · count again from the cards on the table</div>';
+  else if (cutNotice && phase !== 'shoe-end' && tableMode === 'play') h += '<div class="banner cut">Cut card is out · last round of the shoe</div>';
   if (phase === 'shoe-end') h += '<div class="banner cut">Shoe complete</div>';
   if (banner) h += `<div class="banner">${esc(banner)}</div>`;
   const sl = round && round.side ? sideLines(round.side) : [];
@@ -3698,7 +3723,7 @@ function openSummary(sum) {
           <div><span>Count check</span>${chk}</div>
         </div>
         <div><h3 class="sec-h">Misplays and brilliant plays</h3>${mist}</div>
-        <p class="note" style="margin:0">EV is each round’s bet times your edge at the true count before the deal, using the edge table for these rules (Strategy chart → Edge). Misplays are saved for Review mode. ${sum.exhausted ? 'The shoe ran out of cards before the cut card, so one round finished with a fresh deck.' : ''}</p>
+        <p class="note" style="margin:0">EV is each round’s bet times your edge at the true count before the deal, using the edge table for these rules (Strategy chart → Edge). Misplays are saved for Review mode. ${sum.exhausted ? 'The shoe ran out of cards in the last round, so the dealer shuffled the discards to finish it.' : ''}</p>
         <div class="grid-stats" style="padding-top:12px;border-top:1px solid var(--line)">
           <div><span>Session shoes</span><b>${session.shoes.length}</b></div>
           <div><span>Session result</span><b class="${tone(tt.net)}">${fmt$(tt.net, true)}</b></div>
