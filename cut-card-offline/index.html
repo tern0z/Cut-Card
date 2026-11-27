@@ -195,7 +195,19 @@ h2, h3 { text-wrap: balance; }
 .bots:empty { display: none; }
 .player-zone { grid-row: 6; display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-end; gap: 10px 16px; width: 100%; min-height: calc(var(--cw) * 1.4 + 58px); z-index: 1; }
 .player-zone.many { --cw: calc(var(--cw0) * .76); }
-.player-zone.lots { --cw: calc(var(--cw0) * .62); }
+/* five or more hands: smaller cards, the total over the bet, short result labels; nine or more: smaller still */
+.player-zone.lots { --cw: calc(var(--cw0) * .62); gap: 10px 8px; }
+.player-zone.crowd { --cw: calc(var(--cw0) * .52); gap: 8px 4px; }
+/* nine or more hands all bet the same, so the bet chip gives way to a ×2 mark on the hands you doubled */
+.player-zone.crowd .betchip { display: none; }
+.player-zone.lots.crowd .phand { padding-left: 3px; padding-right: 3px; }
+.player-zone.crowd .phand.dbl::after { content: "×2"; position: absolute; top: 10px; right: 0; padding: 1px 4px; border-radius: 6px; background: var(--gold); color: var(--gold-ink); font: 700 9.5px/1.2 var(--f-mono); z-index: 2; }
+.player-zone.lots .phand { padding: 8px 4px 5px; gap: 4px; border-radius: 12px; }
+.player-zone.lots .phand .meta { flex-direction: column; gap: 3px; }
+.player-zone.lots .tot { font-size: 12.5px; padding: 2px 7px; min-width: 22px; }
+.player-zone.lots .betchip { font-size: 11px; padding: 1px 6px 1px 2px; gap: 4px; }
+.player-zone.lots .betchip i { width: 11px; height: 11px; }
+.player-zone.lots .res { top: -8px; padding: 2px 6px; font-size: 9.5px; letter-spacing: .05em; }
 
 .cards { display: flex; align-items: flex-start; min-height: calc(var(--cw) * 1.4); }
 .cards > .card + .card { margin-left: calc(var(--cw) * -0.56); }
@@ -233,7 +245,8 @@ h2, h3 { text-wrap: balance; }
 .res.push, .res.surr { background: #d8ddd9; color: #18201c; }
 
 .betspot { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-.betspot .rings { display: flex; gap: 12px; }
+/* --per bets to a row: each ring is its width plus a 2px border on each side, with 12px between rings */
+.betspot .rings { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; max-width: calc(var(--per, 99) * (var(--cw) * 1.3 + 16px) + 4px); }
 .betring { width: calc(var(--cw) * 1.3); height: calc(var(--cw) * 1.3); border-radius: 50%; border: 2px dashed var(--print); display: grid; place-items: center; position: relative; }
 .betring .chipstack { position: relative; width: 44px; height: 44px; }
 .betring .chipstack i { position: absolute; left: 0; width: 44px; height: 44px; border-radius: 50%; background: radial-gradient(circle, var(--c) 0 52%, transparent 53%), repeating-conic-gradient(var(--c) 0 20deg, #f3efe4 20deg 30deg); box-shadow: inset 0 0 0 3px var(--c), 0 3px 6px rgba(0,0,0,.4); }
@@ -274,7 +287,8 @@ h2, h3 { text-wrap: balance; }
 .fb.brill { box-shadow: 0 0 0 1.5px rgba(92,200,255,.8), 0 0 18px rgba(92,200,255,.28), 0 8px 20px rgba(0,0,0,.28); }
 .fb.marg .ico { background: var(--marg); color: var(--marg-ink); }
 .fb.marg { box-shadow: 0 0 0 1.5px rgba(154,165,160,.55), 0 8px 20px rgba(0,0,0,.28); }
-.fbtn { display: inline-block; margin-top: 2px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line-2); background: rgba(5, 20, 14, .82); color: var(--text); font: 700 12px/1.2 var(--f-body); cursor: pointer; }
+/* the space below keeps it off the result labels on top of your hands */
+.fbtn { display: inline-block; margin: 2px 0 10px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line-2); background: rgba(5, 20, 14, .82); color: var(--text); font: 700 12px/1.2 var(--f-body); cursor: pointer; }
 .fbtn:hover { background: var(--panel-3); }
 /* a player blackjack glows */
 .phand.bj { background: rgba(244,192,79,.09); box-shadow: 0 0 0 2px var(--gold), 0 0 26px 6px rgba(244,192,79,.42); animation: bjglow 1.3s ease-in-out infinite alternate; }
@@ -311,7 +325,7 @@ h2, h3 { text-wrap: balance; }
 /* how many hands to bet on, when more than one hand is on */
 .spots { display: flex; justify-content: center; align-items: center; gap: 6px; }
 .spots > span { font: 700 12px/1 var(--f-display); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-right: 6px; }
-.spots button { min-width: 46px; height: 34px; border-radius: 10px; border: 1px solid var(--line-2); background: var(--panel-2); color: var(--text-2); font: 700 15px/1 var(--f-mono); cursor: pointer; }
+.spots button { flex: 0 1 46px; min-width: 0; height: 34px; border-radius: 10px; border: 1px solid var(--line-2); background: var(--panel-2); color: var(--text-2); font: 700 15px/1 var(--f-mono); cursor: pointer; }
 .spots button:hover { background: var(--panel-3); }
 .spots button.on { background: var(--gold); border-color: var(--gold); color: var(--gold-ink); }
 .spots button:disabled { opacity: .45; cursor: default; }
@@ -1419,6 +1433,10 @@ function actionEVsBin(strat, ctx, b) {
   return out;
 }
 
+// Splits never take the table past this many of your hands, so they all fit on the table (with up to 8
+// starting hands, each can still split). The game simulation uses the same limit.
+const TABLE_HANDS = 16;
+
 // ---- Monte Carlo simulation: the game dealt card by card, played from the chart with a bet table ----
 // cfg: { rounds, ramp: 14 bets per hand for TC -3..+10 (0 = sit out), hands: 14 numbers of hands to play
 //        (optional, one each), opts: decision options, onProgress(frac) }
@@ -1466,7 +1484,7 @@ function simulateGame(strat, cfg) {
       // blackjacks are paid now; the other hands are played out in order, each split hand right after its parent
       const hands = [];
       spots.forEach((c, s) => { if (isBJ(c)) total += R.bjPays * b; else hands.push({ c, spot: s, split: false, aces: false, bust: false, sur: false, dbl: false }); });
-      let onTable = n;                    // splits stop at 8 of your hands, as at the table
+      let onTable = n;                    // splits stop at TABLE_HANDS of your hands, as at the table
       for (let i = 0; i < hands.length; i++) {
         const h = hands[i];
         if (h.c.length === 1) { const v = draw(); see(v); h.c.push(v); }
@@ -1476,7 +1494,7 @@ function simulateGame(strat, cfg) {
           const two = h.c.length === 2, pair = two && h.c[0] === h.c[1];
           let fromSpot = 0; for (const x of hands) if (x.spot === h.spot) fromSpot++;   // the split rule is per starting hand
           const canHit = !h.aces || R.hsa || R.dsa;
-          const canSplit = pair && fromSpot < maxH && onTable < 8 && (h.c[0] !== 1 || !h.split || R.rsa || R.dsa);
+          const canSplit = pair && fromSpot < maxH && onTable < TABLE_HANDS && (h.c[0] !== 1 || !h.split || R.rsa || R.dsa);
           if (!canHit && !canSplit) break;
           const canDouble = two && (!h.aces || R.dsa) && (!h.split || R.das) && canDoubleTotal(hi.hard, hi.ace, R);
           const canSurrender = R.surrender && two && !h.split && fromSpot === 1;
@@ -1727,7 +1745,8 @@ const DEFAULTS = {
   riskBank: 10000, rph: 100, tripHours: 4,
   bots: 0, speed: 'normal', countCheck: true, randomChecks: false,
 };
-const MAX_SPOTS = 4;
+const MAX_SPOTS = 8;
+const SPOT_CHOICES = Array.from({ length: MAX_SPOTS }, (_, i) => i + 1);
 // the bet table has one entry per true count: TC -3 or lower, -2 ... +9, +10 or higher
 const RAMP_TCS = [-3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const RAMP_LABELS = ['\u2264\u22123', '\u22122', '\u22121', '0', '+1', '+2', '+3', '+4', '+5', '+6', '+7', '+8', '+9', '\u2265+10'];
@@ -2124,8 +2143,7 @@ const valsOf = (h) => h.cards.map((c) => c.v);
 const infoOf = (h) => handInfo(valsOf(h));
 const isNatural = (h) => h.cards.length === 2 && !h.fromSplit && infoOf(h).total === 21;
 const maxHandsGame = () => Math.min(settings.maxHands, 8);
-// Splits never take the table past this many of your hands, so they all fit (the split rule allows 8 at most).
-const TABLE_HANDS = 8;
+// (splits also stop at TABLE_HANDS of your hands on the table, from the core script)
 function allowedFor(h, hands) {
   const v = valsOf(h), hi = handInfo(v);
   if (h.done || hi.total >= 21) return [];
@@ -3274,6 +3292,7 @@ function totalText(h) {
   return String(hi.total);
 }
 const RES_TXT = { win: 'Win', lose: 'Lose', push: 'Push', bj: 'Blackjack', bust: 'Bust', surr: 'Surrender' };
+const RES_SHORT = Object.assign({}, RES_TXT, { bj: 'BJ', surr: 'Surr' });   // when five or more hands share the table
 
 function renderTable() {
   const r = round;
@@ -3331,7 +3350,8 @@ function renderTable() {
     return;
   }
   if (pz.querySelector('.betspot')) pz.innerHTML = '';
-  pz.className = 'player-zone' + (r.hands.length >= 5 ? ' lots' : r.hands.length >= 3 ? ' many' : '');
+  const nh = r.hands.length, packed = nh >= 5, crowd = nh >= 9;
+  pz.className = 'player-zone' + (crowd ? ' lots crowd' : packed ? ' lots' : nh >= 3 ? ' many' : '');
   const ids = new Set(r.hands.map((h) => String(h.id)));
   for (const x of [...pz.children]) if (!ids.has(x.dataset.hid)) x.remove();
   let prev = null;
@@ -3348,13 +3368,18 @@ function renderTable() {
     syncCards(el.querySelector('.cards'), h.cards, null);
     el.classList.toggle('active', !r.done && r.active === i && (phase === 'play' || (phase === 'deal' && r.hands.length > 1)));
     el.classList.toggle('bj', !!h.bj);
+    el.classList.toggle('dbl', !!h.doubled);
     const tt = el.querySelector('.tot');
     tt.textContent = totalText(h);
     tt.className = 'tot' + (infoOf(h).hard > 21 ? ' bust' : h.bj ? ' bj' : '');
     const bc = el.querySelector('.betchip span');
     bc.textContent = fmt$(h.bet * (h.doubled ? 2 : 1)) + (h.doubled ? ' ×2' : '');
     const res = el.querySelector('.res');
-    if (h.result && r.done) { res.hidden = false; res.className = 'res ' + h.result; res.textContent = RES_TXT[h.result] + (h.net ? ' ' + fmt$(h.net, true) : ''); }
+    if (h.result && r.done) {
+      res.hidden = false; res.className = 'res ' + h.result;
+      // a crowded table shows just the money (the colour says win or lose)
+      res.textContent = crowd ? (h.net ? fmt$(h.net, true) : RES_SHORT[h.result]) : (packed ? RES_SHORT : RES_TXT)[h.result] + (h.net ? ' ' + fmt$(h.net, true) : '');
+    }
     else res.hidden = true;
   });
 }
@@ -3368,8 +3393,9 @@ function chipStackHTML(amount) {
 function betSpotHTML() {
   if (!(bet > 0)) return '<div class="betspot"><div class="betring sit"><span>Sit out</span></div><span class="betamt">Watch the next round</span></div>';
   const ring = `<div class="betring"><div class="chipstack">${chipStackHTML(bet)}</div></div>`;
-  const sides = sidesNow();
-  return `<div class="betspot"><div class="rings">${ring.repeat(spotsNow())}</div><span class="betamt">${betTxt(bet, spotsNow())}</span>${sides.length
+  const sides = sidesNow(), n = spotsNow();
+  // more than four bets go in two rows
+  return `<div class="betspot"><div class="rings"${n > 4 ? ` style="--per:${Math.ceil(n / 2)}"` : ''}>${ring.repeat(n)}</div><span class="betamt">${betTxt(bet, n)}</span>${sides.length
     ? `<span class="betside">+ ${sides.map((id) => SIDE_NAME[id]).join(' and ')} ${fmt$(settings.sideAmt)}${spotsNow() > 1 ? ' a hand' : ''}</span>` : ''}</div>`;
 }
 
@@ -3507,7 +3533,7 @@ function renderDock() {
     dockKey = dk;
     if (key === 'bet') {
       d.innerHTML = `<div class="chips">${CHIPS.map((v, i) => `<button class="chip c${v}" data-chip="${v}" aria-label="Add $${v}" title="Add $${v} (${i + 1})"><span>${v >= 1000 ? '1K' : v}</span></button>`).join('')}</div>
-        ${multi ? `<div class="spots" role="group" aria-label="Hands to play"><span>Hands</span>${[1, 2, 3, 4].map((n) => `<button type="button" data-spots="${n}" aria-label="${n} hand${n === 1 ? '' : 's'}">${n}</button>`).join('')}</div>` : ''}
+        ${multi ? `<div class="spots" role="group" aria-label="Hands to play"><span>Hands</span>${SPOT_CHOICES.map((n) => `<button type="button" data-spots="${n}" aria-label="${n} hand${n === 1 ? '' : 's'}">${n}</button>`).join('')}</div>` : ''}
         ${sideIds.length ? `<div class="sides" role="group" aria-label="Side bets">${sideIds.map((id) => `<button type="button" class="sbt" data-side="${id}" title="${SIDE_NAME[id]} (${id === 'll' ? 'L' : 'K'})"><span>${SIDE_NAME[id]}</span><b>${fmt$(settings.sideAmt)}</b></button>`).join('')}</div>` : ''}
         <div class="betrow"><button class="btn" id="btnClear">Clear</button><button class="btn" id="btnRamp" title="Set the bet your ramp calls for">Ramp</button><button class="btn primary" id="btnDeal"><span id="dealLbl">Deal</span> <b id="dealAmt" style="font-family:var(--f-mono);letter-spacing:0;margin-left:4px"></b></button></div>`;
     } else if (key === 'review') {
@@ -4376,7 +4402,7 @@ function openSettings() {
           const max = Math.max(0.25, draft.decks - 0.5);
           ctl = `<div class="rangebox"><input type="range" id="cutRange" min="0.25" max="${max}" step="0.25" value="${Math.min(draft.cutDecks, max)}"><output id="cutOut"></output></div>`;
         } else if (it.type === 'rampTable') ctl = `<div class="rampwrap"><div class="rampgrid">${RAMP_TCS.map((k, i) => `<label><span>${RAMP_LABELS[i]}</span><input type="number" inputmode="numeric" min="0" step="5" id="rb${i}" class="${draft.rampBets[i] > 0 ? '' : 'zero'}" value="${draft.rampBets[i]}" data-rb="${i}" aria-label="Bet at true count ${RAMP_LABELS[i]}">${draft.multiHands
-            ? `<select data-rh="${i}" class="${draft.rampHands[i] > 1 ? '' : 'one'}" aria-label="Hands at true count ${RAMP_LABELS[i]}">${[1, 2, 3, 4].map((n) => `<option value="${n}"${draft.rampHands[i] === n ? ' selected' : ''}>×${n}</option>`).join('')}</select>` : ''}</label>`).join('')}</div>
+            ? `<select data-rh="${i}" class="${draft.rampHands[i] > 1 ? '' : 'one'}" aria-label="Hands at true count ${RAMP_LABELS[i]}">${SPOT_CHOICES.map((n) => `<option value="${n}"${draft.rampHands[i] === n ? ' selected' : ''}>×${n}</option>`).join('')}</select>` : ''}</label>`).join('')}</div>
             <div class="presets">${PRESETS.map(([id, l]) => `<button type="button" class="btn small" data-preset="${id}">${l}</button>`).join('')}</div></div>`;
         else if (it.type === 'riskLive') ctl = '<div class="risklive" id="riskLive"></div>';
         else if (it.type === 'customDevs') ctl = `<div class="cdevs">${val.length ? val.map((k) => `<span class="cdev">${esc(customDevLabel(k))}<button type="button" data-rmdev="${esc(k)}" aria-label="Remove ${esc(customDevLabel(k))}">×</button></span>`).join('') : '<span class="note">None yet. When a play off your chart beats it, the feedback offers to add it.</span>'}</div>`;
